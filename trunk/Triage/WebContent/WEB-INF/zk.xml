@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		zk.xml Purpose: Description: History: Created by ZK Studio
+	-->
+<zk>
+	<device-config>
+	    <device-type>ajax</device-type>    
+	    <timeout-uri>/login.zul</timeout-uri>    
+	</device-config>
+
+	<log>
+		<description>[Optional] Monitor i3-log.conf and register a handler for the specified log-base</description>
+		<log-base></log-base>
+	</log>
+
+	<!--
+	<language-config>
+		<addon-uri>/WEB-INF/lang-addon.xml</addon-uri>
+	</language-config>
+	-->
+
+	<!-- Turn on the following if used with WebLogic 9.1
+	<system-config>
+		<cache-provider-class>org.zkoss.zk.ui.sys.GlobalDesktopCacheProvider</cache-provider-class>
+	</system-config>
+	-->
+
+	<!-- Hibernate SessionFactory lifecycle -->
+	<listener>
+		<description>Hibernate SessionFactory lifecycle</description>
+		<listener-class>org.zkoss.zkplus.hibernate.HibernateSessionFactoryListener</listener-class>
+	</listener>
+	
+	<!-- Hibernate OpenSessionInView Pattern -->
+	<listener>
+		<description>Hibernate Open Session In View lifecycle</description>
+		<listener-class>org.zkoss.zkplus.hibernate.OpenSessionInViewListener</listener-class>
+	</listener>
+
+	<!-- Hibernate thread sesson context handler -->
+	<listener>
+		<description>Hibernate thread session context handler</description>
+		<listener-class>org.zkoss.zkplus.hibernate.HibernateSessionContextListener</listener-class>
+	</listener>
+</zk>

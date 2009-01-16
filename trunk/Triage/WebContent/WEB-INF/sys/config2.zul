@@ -1,0 +1,148 @@
+<vbox id="authPage">
+	<zscript><![CDATA[
+	void saveConfig() {
+		String authType = authtype.getSelectedItem().getValue() ;
+		Properties config = (Properties)desktop.getAttribute("config") ;
+		if (authType.contains("ad")) {
+			config.put("auth.type","ad") ;
+			config.put("auth.ad.domaincontroller",addc.getValue()) ;
+			config.put("auth.ad.domain",addomain.getValue()) ;
+			config.put("auth.ad.adminuser",adadminuser.getValue()) ;
+			config.put("auth.ad.adminpass",adadminpass.getValue()) ;
+			config.put("auth.ad.basedn",adbasedn.getValue()) ;
+			config.put("auth.ad.useSSL",adUseSSL.isChecked()) ;
+		} else if (authType.contains("sql")) {
+			config.put("auth.type","sql") ;
+		} else {
+			config.put("auth.type","ldap") ;
+			config.put("auth.ldap.server",ldapdc.getValue()) ;
+			config.put("auth.ldap.domain",ldapdomain.getValue()) ;
+			config.put("auth.ldap.adminuser",ldapadminuser.getValue()) ;
+			config.put("auth.ldap.adminpass",ldapadminpass.getValue()) ;
+			config.put("auth.ldap.basedn",ldapbasedn.getValue()) ;
+			config.put("auth.ldap.useSSL",ldapUseSSL.isChecked()) ;
+		}
+		desktop.getPage("indexZul").getFellow("workspace").getChildren().clear() ;
+		Executions.createComponents("WEB-INF/sys/config3.zul",desktop.getPage("indexZul").getFellow("workspace"),null) ;
+	}
+
+	void showAuthParams() {
+		ad.setVisible(false) ;
+		sql.setVisible(false) ;
+		ldap.setVisible(false) ;
+		String authType = authtype.getSelectedItem().getValue() ;
+		authPage.getFellow(authType).setVisible(true) ;
+	}
+	]]></zscript>
+	<hbox>
+		<vbox width="220px">
+			<label value="User Management: "/>
+		</vbox>
+		<vbox>
+			<listbox id="authtype" onSelect="showAuthParams();" rows="1" mold="select">
+				<listitem label="Active Directory" value="ad" selected="true"/>
+				<listitem label="SQL" value="sql"/>
+				<listitem label="OpenLDAP" value="ldap"/>
+			</listbox>
+		</vbox>
+		<button label="Go" onClick="showAuthParams();" />
+	</hbox>
+	<vbox id="ad" visible="false">
+		<hbox>
+			<vbox width="220px">
+				<label value="Domain Controller Address: "/>
+			</vbox>
+			<vbox>
+				<textbox id="addc" width="220px"/>
+			</vbox>
+		</hbox>
+		<hbox>
+			<vbox width="220px">
+				<label value="Domain Name (e.g. mycompany.com): "/>
+			</vbox>
+			<vbox>
+				<textbox id="addomain" width="220px"/>
+			</vbox>
+		</hbox>
+		<hbox>
+			<vbox width="220px">
+				<label value="Domain Admin Account: "/>
+			</vbox>
+			<vbox>
+				<textbox id="adadminuser" width="220px"/>
+			</vbox>
+		</hbox>
+		<hbox>
+			<vbox width="220px">
+				<label value="Domain Admin Password: "/>
+			</vbox>
+			<vbox>
+				<textbox id="adadminpass" width="220px"/>
+			</vbox>
+		</hbox>
+		<hbox>
+			<vbox width="220px">
+				<label value="Base DN (e.g. DC=mycompany,DC=com): "/>
+			</vbox>
+			<vbox>
+				<textbox id="adbasedn" width="220px"/>
+			</vbox>
+		</hbox>
+		<hbox>
+			<vbox width="220px">
+				<label value="Use SSL: "/>
+			</vbox>
+			<vbox>
+				<checkbox id="adUseSSL"/>
+			</vbox>
+		</hbox>
+	</vbox>
+	<vbox id="sql" visible="false">
+		<label value="You chose SQL authentication, nothing more to configure!"/>
+	</vbox>
+	<vbox id="ldap" visible="false">
+		<hbox>
+			<vbox width="220px">
+				<label value="LDAP Server Address: "/>
+			</vbox>
+			<vbox>
+				<textbox id="ldapdc" width="220px"/>
+			</vbox>
+		</hbox>
+		<hbox>
+			<vbox width="220px">
+				<label value="Manager Account: "/>
+			</vbox>
+			<vbox>
+				<textbox id="ldapadminuser" width="220px"/>
+			</vbox>
+		</hbox>
+		<hbox>
+			<vbox width="220px">
+				<label value="Manager Password: "/>
+			</vbox>
+			<vbox>
+				<textbox id="ldapadminpass" width="220px"/>
+			</vbox>
+		</hbox>
+		<hbox>
+			<vbox width="220px">
+				<label value="Base DN (e.g. DC=mycompany,DC=com): "/>
+			</vbox>
+			<vbox>
+				<textbox id="ldapbasedn" width="220px"/>
+			</vbox>
+		</hbox>
+		<hbox>
+			<vbox width="220px">
+				<label value="Use SSL: "/>
+			</vbox>
+			<vbox>
+				<checkbox id="ldapUseSSL"/>
+			</vbox>
+		</hbox>
+	</vbox>
+	<hbox align="center">
+		<button onClick="saveConfig();" label="Step 3 &gt;&gt;"/>
+	</hbox>
+</vbox>

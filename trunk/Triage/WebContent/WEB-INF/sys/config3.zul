@@ -1,0 +1,46 @@
+<vbox>
+	<zscript><![CDATA[
+	void saveConfig() {
+		
+	}
+
+	void enableImapSettings() {
+		boolean status = !self.isChecked() ;
+		imapServer.setDisabled(status) ;
+		imapUser.setDisabled(status) ;
+		imapPass.setDisabled(status) ;
+	}
+	]]></zscript>	
+	<hbox>
+		<vbox width="220px">
+			<label value="Use An IMAP Mailbox: "/>
+		</vbox>
+		<vbox>
+			<checkbox id="useimap" onCheck="enableImapSettings();"/>
+		</vbox>
+	</hbox>
+	<hbox>
+		<vbox width="220px">
+			<label value="IMAP Server: "/>
+		</vbox>
+		<vbox>
+			<textbox id="imapServer" width="220px" disabled="true"/>
+		</vbox>
+	</hbox>
+	<hbox>
+		<vbox width="220px">
+			<label value="IMAP Username: "/>
+		</vbox>
+		<vbox>
+			<textbox id="imapUser" type="password" width="220px" disabled="true"/>
+		</vbox>
+	</hbox>
+	<hbox>
+		<vbox width="220px">
+			<label value="IMAP Password: "/>
+		</vbox>
+		<vbox>
+			<textbox id="imapPass" width="220px" disabled="true"/>
+		</vbox>
+	</hbox>
+</vbox>

@@ -1,0 +1,191 @@
+<vbox>
+	<zscript><![CDATA[
+	Properties config = null ;
+
+	boolean dbIsGood = false ;
+
+	void buttonPressed() {
+		if (dbIsGood) {
+			saveConfig() ;
+		} else {
+			testDb() ;
+		}
+	}
+
+	void setRetest() {
+		dbIsGood = false ;
+		nextButton.setLabel("Test Connection") ;
+	}
+
+	void saveConfig() {
+		if (!config.getClass().isInstance(Properties.class)) {
+			config = new Properties() ;
+			config.put("hibernate.c3p0.acquire_increment","1") ;
+			config.put("hibernate.c3p0.idle_test_period","300") ;
+			config.put("hibernate.c3p0.max_size","100") ;
+			config.put("hibernate.c3p0.max_statements","0") ;
+			config.put("hibernate.c3p0.min_size","5") ;
+			config.put("hibernate.c3p0.timeout","100") ;
+			config.put("hibernate.c3p0.preferredTestQuery","SELECT 1") ;
+			config.put("hibernate.hbm2ddl.auto","update") ;
+			config.put("hibernate.connection.provider_class","org.hibernate.connection.C3P0ConnectionProvider") ;
+			config.put("hibernate.search.default.directory_provider","org.hibernate.search.store.FSDirectoryProvider") ;
+			config.put("hibernate.search.default.indexBase","/var/lucene/indexes") ;
+			config.put("hibernate.show_sql","true") ;
+		}
+		String dbType = dbtype.getSelectedItem().getValue() ;
+		String dbUrlStr = null ;
+		if (dbType.compareTo("pgsql")==0) {
+			config.put("hibernate.connection.driver_class","org.postgresql.Driver") ;
+			config.put("hibernate.dialect","org.hibernate.dialect.PostgreSQLDialect") ;
+			dbUrlStr = "postgresql" ;
+		} else if (dbType.compareTo("mysql")==0) {
+			config.put("hibernate.connection.driver_class","com.mysql.jdbc.Driver") ;
+			config.put("hibernate.dialect","org.hibernate.dialect.MySQL5Dialect") ;
+			dbUrlStr = "mysql" ;
+		} else if (dbType.compareTo("mssql")==0) {
+			config.put("hibernate.connection.driver_class","com.microsoft.sqlserver.jdbc.SQLServerDriver") ;
+			config.put("hibernate.dialect","org.hibernate.dialect.SybaseDialect") ;
+			dbUrlStr = "sqlserver" ;
+		} else if (dbType.compareTo("db2")==0) {
+			config.put("hibernate.connection.driver_class","com.ibm.db2.jdbc.app.DB2Driver") ;
+			config.put("hibernate.dialect","org.hibernate.dialect.DB2Dialect") ;
+			dbUrlStr = "db2" ;
+		} else if (dbType.compareTo("oracle")==0) {
+			config.put("hibernate.connection.driver_class","oracle.jdbc.driver.OracleDriver") ;
+			config.put("hibernate.dialect","org.hibernate.dialect.OracleDialect") ;
+			dbUrlStr = "oracle:thin" ;
+		} else {
+			Messagebox.show("For some reason the database type selection failed. Please re-select the database type and try again.","ERROR",Messagebox.OK,Messagebox.ERROR) ;
+		}
+		config.put("hibernate.connection.url","jdbc:"+dbUrlStr+"://"+dbhost.getValue()+"/"+dbname.getValue()) ;
+		config.put("hibernate.connection.username",dbuser.getValue()) ;
+		config.put("hibernate.connection.password",dbpass.getValue()) ;
+		desktop.setAttribute("config",config) ;
+		desktop.getPage("indexZul").getFellow("workspace").getChildren().clear() ;
+		Executions.createComponents("WEB-INF/sys/config2.zul",desktop.getPage("indexZul").getFellow("workspace"),null) ;
+	}
+
+	void testDb() {
+		if (!Properties.class.isInstance(config)) {
+			config = new Properties() ;
+			config.put("hibernate.c3p0.acquire_increment","1") ;
+			config.put("hibernate.c3p0.idle_test_period","300") ;
+			config.put("hibernate.c3p0.max_size","100") ;
+			config.put("hibernate.c3p0.max_statements","0") ;
+			config.put("hibernate.c3p0.min_size","5") ;
+			config.put("hibernate.c3p0.timeout","100") ;
+			config.put("hibernate.c3p0.preferredTestQuery","SELECT 1") ;
+			config.put("hibernate.hbm2ddl.auto","update") ;
+			config.put("hibernate.connection.provider_class","org.hibernate.connection.C3P0ConnectionProvider") ;
+			config.put("hibernate.search.default.directory_provider","org.hibernate.search.store.FSDirectoryProvider") ;
+			config.put("hibernate.search.default.indexBase","/var/lucene/indexes") ;
+			config.put("hibernate.show_sql","true") ;
+		}
+		String dbType = (String)dbtype.getSelectedItem().getValue() ;
+		String dbUrlStr = null ;
+		if (dbType.compareTo("pgsql")==0) {
+			config.put("hibernate.connection.driver_class","org.postgresql.Driver") ;
+			config.put("hibernate.dialect","org.hibernate.dialect.PostgreSQLDialect") ;
+			dbUrlStr = "postgresql" ;
+		} else if (dbType.compareTo("mysql")==0) {
+			config.put("hibernate.connection.driver_class","com.mysql.jdbc.Driver") ;
+			config.put("hibernate.dialect","org.hibernate.dialect.MySQL5Dialect") ;
+			dbUrlStr = "mysql" ;
+		} else if (dbType.compareTo("mssql")==0) {
+			config.put("hibernate.connection.driver_class","com.microsoft.sqlserver.jdbc.SQLServerDriver") ;
+			config.put("hibernate.dialect","org.hibernate.dialect.SybaseDialect") ;
+			dbUrlStr = "sqlserver" ;
+		} else if (dbType.compareTo("db2")==0) {
+			config.put("hibernate.connection.driver_class","com.ibm.db2.jdbc.app.DB2Driver") ;
+			config.put("hibernate.dialect","org.hibernate.dialect.DB2Dialect") ;
+			dbUrlStr = "db2" ;
+		} else if (dbType.compareTo("oracle")==0) {
+			config.put("hibernate.connection.driver_class","oracle.jdbc.driver.OracleDriver") ;
+			config.put("hibernate.dialect","org.hibernate.dialect.OracleDialect") ;
+			dbUrlStr = "oracle:thin" ;
+		} else {
+			Messagebox.show("For some reason the database type selection failed. Please re-select the database type and try again.","ERROR",Messagebox.OK,Messagebox.ERROR) ;
+		}
+		config.put("hibernate.connection.url","jdbc:"+dbUrlStr+"://"+dbhost.getValue()+"/"+dbname.getValue()) ;
+		config.put("hibernate.connection.username",dbuser.getValue()) ;
+		config.put("hibernate.connection.password",dbpass.getValue()) ;
+		org.hibernate.cfg.AnnotationConfiguration cfg = new org.hibernate.cfg.AnnotationConfiguration() ;
+		boolean isConnected = true ;
+		try {
+			cfg.setProperties(config)
+				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.Software.class)
+				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.Request.class)
+				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.RequestNote.class)
+				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.Device.class)
+				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.Solution.class)
+				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.Ticket.class)
+				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.TicketNote.class)
+				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.User.class) ;
+			org.hibernate.SessionFactory sessFactory = cfg.buildSessionFactory() ;
+		} catch (Exception he) {
+			isConnected = false ;
+			Messagebox.show("An error occurred while trying to connect to the database. The error message was '"+he.getLocalizedMessage()+"'. Please check your database settings and try again.","Database Error",Messagebox.OK,Messagebox.ERROR) ;
+		}
+		if (isConnected) {
+			success.setVisible(true) ;
+			nextButton.setLabel("Step 2 >>") ;
+			dbIsGood = true ;
+		}
+	}
+	]]></zscript>
+	<hbox>
+		<vbox width="160px">
+			<label value="Database Platform: "/>
+		</vbox>
+		<vbox>
+			<listbox id="dbtype" rows="1" mold="select" onSelect="setRetest();" >
+				<listitem label="PostgreSQL" value="pgsql" selected="true"/>
+				<listitem label="MySQL" value="mysql"/>
+				<listitem label="Microsoft SQL Server" value="mssql"/>
+				<listitem label="DB2" value="db2"/>
+				<listitem label="Oracle" value="oracle"/>
+			</listbox>
+		</vbox>
+	</hbox>
+	<hbox>
+		<vbox width="160px">
+			<label value="Database Host: "/>
+		</vbox>
+		<vbox>
+			<textbox id="dbhost" width="160px" onChanging="setRetest();"/>
+		</vbox>
+	</hbox>
+	<hbox>
+		<vbox width="160px">
+			<label value="Database Name: "/>
+		</vbox>
+		<vbox>
+			<textbox id="dbname" width="160px" onChanging="setRetest();"/>
+		</vbox>
+	</hbox>
+	<hbox>
+		<vbox width="160px">
+			<label value="Database User: "/>
+		</vbox>
+		<vbox>
+			<textbox id="dbuser" width="160px" onChanging="setRetest();"/>
+		</vbox>
+	</hbox>
+	<hbox>
+		<vbox width="160px">
+			<label value="Database Password: "/>
+		</vbox>
+		<vbox>
+			<textbox id="dbpass" type="password" value="" width="160px" onChanging="setRetest();"/>
+		</vbox>
+	</hbox>
+	<hbox align="center">
+		<vbox width="160px">
+			<button id="nextButton" onClick="buttonPressed();" label="Test Connection" />
+		</vbox>
+	</hbox>
+	<hbox align="center">
+		<label visible="false" id="success" value="Database connection established successfully!" style="font-size: 14pt; color: #00AA00;"/>
+	</hbox>
+</vbox>
