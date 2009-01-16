@@ -1,0 +1,13 @@
+#summary Overview of Triage Help Desk
+
+= Introduction =
+
+    When I started this project, I was looking for a help desk application which would leverage previous work to make solving common problems quick and simple. The idea is that as a technician enters a new ticket, the application will present them with previous tickets/solutions which may be related and be able to present a quick answer. This way, knowledge is not lost and can be easily leveraged even with new personnel in the IT work force.
+
+= Philosophy =
+
+    The application should be designed to be extensible in several ways. One method is the authentication subsystem. The initial release should support Active Directory, LDAP, and SQL based authentication. Each of these should implement the "Authenticator" interface as a way to make the authentication classes compatible.
+
+    Another area which should be extensible is the methods by which tickets can be created. For my environment, I intend to implement ticket generators for our OpenNMS system and allow our Asterisk IP PBX to create a ticket when our Help Desk phone line is answered. Other plug-ins could conceivably be produced to integrate with Nagios, Tivoli, OpenView, etc....
+
+    Finally, I would like to the application to be a Rich Internet Application through the use of the [http://www.zkoss.org/ ZK] framework.
