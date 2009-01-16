@@ -1,0 +1,5 @@
+#summary AuthProvider interface
+
+= Overview =
+
+AuthProvider is a Java Interface definition in the triage application which defines the required methods for an Authentication Provider plug-in.
