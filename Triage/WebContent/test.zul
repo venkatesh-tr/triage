@@ -1,0 +1,6 @@
+<?page title="Triage - Main" contentType="text/html;charset=UTF-8"?>
+<zk>
+<zscript><![CDATA[
+	Executions.createComponents("WEB-INF/sys/test.zul",null,new HashMap()) ;
+]]></zscript>
+</zk>

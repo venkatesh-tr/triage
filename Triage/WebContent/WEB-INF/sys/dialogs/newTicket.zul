@@ -1,0 +1,3 @@
+<window id="newTicket" closable="true" defaultActionOnShow="slideDown" title="New Ticket" top="120px" left="140px" mode="overlapped" width="600px" height="430px" border="normal">
+	<label value="New Ticket"/>
+</window>
