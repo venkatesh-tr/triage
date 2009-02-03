@@ -63,7 +63,7 @@
 		config.put("hibernate.connection.password",dbpass.getValue()) ;
 		desktop.setAttribute("config",config) ;
 		desktop.getPage("indexZul").getFellow("workspace").getChildren().clear() ;
-		Executions.createComponents("WEB-INF/sys/config2.zul",desktop.getPage("indexZul").getFellow("workspace"),null) ;
+		Executions.createComponents("WEB-INF/sys/bootstrap/config2.zul",desktop.getPage("indexZul").getFellow("workspace"),null) ;
 	}
 
 	void testDb() {

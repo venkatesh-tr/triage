@@ -1,4 +1,4 @@
-<?page id="indexZul" title=" New ZUL Title" cacheable="false" 
+<?page id="indexZul" title="Triage Help Desk" cacheable="false" 
 	language="xul/html" zscriptLanguage="Java" contentType="text/html;charset=UTF-8"?>
 <zk xmlns="http://www.zkoss.org/2005/zul"
 	xmlns:h="http://www.w3.org/1999/xhtml" 
@@ -11,7 +11,7 @@
 		if (isConfigured) {
 			
 		} else {
-			Executions.createComponents("WEB-INF/sys/config1.zul",workspace,null) ;
+			Executions.createComponents("WEB-INF/sys/bootstrap/config1.zul",workspace,null) ;
 		}
 	}
 	]]></zscript>

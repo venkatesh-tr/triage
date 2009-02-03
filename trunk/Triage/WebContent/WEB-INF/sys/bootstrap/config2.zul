@@ -23,7 +23,7 @@
 			config.put("auth.ldap.useSSL",ldapUseSSL.isChecked()) ;
 		}
 		desktop.getPage("indexZul").getFellow("workspace").getChildren().clear() ;
-		Executions.createComponents("WEB-INF/sys/config3.zul",desktop.getPage("indexZul").getFellow("workspace"),null) ;
+		Executions.createComponents("WEB-INF/sys/bootstrap/config3.zul",desktop.getPage("indexZul").getFellow("workspace"),null) ;
 	}
 
 	void showAuthParams() {
