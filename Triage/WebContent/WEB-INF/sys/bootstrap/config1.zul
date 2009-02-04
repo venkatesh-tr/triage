@@ -29,6 +29,31 @@
 	}
 
 	void saveConfig() {
+		org.hibernate.cfg.AnnotationConfiguration cfg = new org.hibernate.cfg.AnnotationConfiguration() ;
+		try {
+			cfg.setProperties(config)
+				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.Software.class)
+				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.Request.class)
+				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.RequestNote.class)
+				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.Device.class)
+				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.Solution.class)
+				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.Ticket.class)
+				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.TicketNote.class)
+				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.User.class) ;
+			org.hibernate.SessionFactory myFactory = cfg.buildSessionFactory() ;
+			if (myFactory==null) {
+				Messagebox.show("An error occurred while trying to created the Hibernate SessionFactory. The factory object was null. Please check your database settings and try again.","Database Error",Messagebox.OK,Messagebox.ERROR) ;
+			} else {
+				desktop.getWebApp().setAttribute("hibernateSession",myFactory) ;
+			}
+			desktop.getWebApp().getConfiguration().addListener(com.blogspot.devenphillips.helpdesk.zk.hibernate.HibernateSessionFactoryListener.class) ;
+			desktop.getWebApp().getConfiguration().addListener(com.blogspot.devenphillips.helpdesk.zk.hibernate.OpenSessionInViewListener.class) ;
+			desktop.getWebApp().getConfiguration().addListener(com.blogspot.devenphillips.helpdesk.zk.hibernate.HibernateSessionContextListener.class) ;
+		} catch (Exception he) {
+			org.zkoss.util.logging.Log log = org.zkoss.util.logging.Log.lookup(com.blogspot.devenphillips.helpdesk.zk.hibernate.HibernateUtil.class);
+			log.error("An error occurred while trying to created the database connection pool. The error message was '"+he.getLocalizedMessage()+"'. Please check your database settings and try again.",he) ;
+			Messagebox.show("An error occurred while trying to created the database connection pool. The error message was '"+he.getLocalizedMessage()+"'. Please check your database settings and try again.","Database Error",Messagebox.OK,Messagebox.ERROR) ;
+		}
 		desktop.setAttribute("config",config) ;
 		desktop.getPage("indexZul").getFellow("workspace").getChildren().clear() ;
 		Executions.createComponents("WEB-INF/sys/bootstrap/config2.zul",desktop.getPage("indexZul").getFellow("workspace"),null) ;
@@ -49,6 +74,7 @@
 			config.put("hibernate.search.default.directory_provider","org.hibernate.search.store.FSDirectoryProvider") ;
 			config.put("hibernate.search.default.indexBase","/var/lucene/indexes") ;
 			config.put("hibernate.show_sql","true") ;
+			config.put("hibernate.current_session_context_class","thread") ;
 		}
 		String dbType = (String)dbtype.getSelectedItem().getValue() ;
 		String dbUrlStr = null ;
