@@ -1,5 +1,5 @@
 #labels join,contribute,programming
-[http://code.google.com/p/triage/ http://code.google.com/p/triage/source/browse/trunk/Triage/WebContent/images/triage.png]
+[http://code.google.com/p/triage/ http://triage.googlecode.com/files/triage.png]
 =How To Join The Project=
 
 First, I recommend you join our mailing list. You can do that by sending an e-mail to triage-devel-request@freelists.org with the word "Subscribe" in the subject of the message.
