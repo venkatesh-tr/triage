@@ -1,6 +1,6 @@
 #labels join,contribute,programming
-<div style="background: #83B5F7">
-[http://code.google.com/p/triage/ http://triage.googlecode.com/files/triage.png]</div>
+{{{<div style="background: #83B5F7">}}}
+[http://code.google.com/p/triage/ http://triage.googlecode.com/files/triage.png]{{{</div>}}}
 =How To Join The Project=
 
 First, I recommend you join our mailing list. You can do that by sending an e-mail to triage-devel-request@freelists.org with the word "Subscribe" in the subject of the message.
