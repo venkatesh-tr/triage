@@ -6,6 +6,7 @@
 	Description:
 		
 	History:
+		Wed Feb  3 08:31:00     2009, Modified by Deven Phillips
 		Mon Sep  4 17:18:21     2006, Created by henrichen
 }}IS_NOTE
 
@@ -16,21 +17,14 @@ Copyright (C) 2006 Potix Corporation. All Rights Reserved.
 */
 package com.blogspot.devenphillips.helpdesk.zk.hibernate;
 
-import java.util.Properties;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-
 import org.zkoss.zk.ui.WebApp;
 import org.zkoss.zk.ui.Desktop;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.util.logging.Log;
 import org.zkoss.lang.JVMs;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.ConnectionReleaseMode;
 import org.hibernate.HibernateException;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.AnnotationConfiguration;
@@ -38,6 +32,19 @@ import org.hibernate.cfg.AnnotationConfiguration;
  * <p>Utitlity to access Hibernate Session. This implemenation works with the Hibernate's 
  * thread session context (version 3.1+). That is, you have to specified 
  * hibernate's configuration file "hibernate.cfg.xml" to as follows:</p>
+ * 
+ * <p>Since ZK 3.5.3, if you store a programmatically created SessionFactory via WebApp.setAttribute("hibernateSession",myFactory),
+ * HibernateUtil will use that SessionFactory instead of building one of it's own.</p>
+ * <pre><code>
+ * org.hibernate.cfg.AnnotationConfiguration cfg = new org.hibernate.cfg.AnnotationConfiguration() ;
+ * cfg.setProperties(config) ;
+ * cfg.addAnnotatedClass(<your class name>) ;
+ * . . . 
+ * desktop.getWebApp().setAttribute("hibernateSession",cfg.buildSessionFectory()) ;
+ * desktop.getWebApp().getConfiguration().addListener(com.blogspot.devenphillips.helpdesk.zk.hibernate.HibernateSessionFactoryListener.class) ;
+ * desktop.getWebApp().getConfiguration().addListener(com.blogspot.devenphillips.helpdesk.zk.hibernate.OpenSessionInViewListener.class) ;
+ * desktop.getWebApp().getConfiguration().addListener(com.blogspot.devenphillips.helpdesk.zk.hibernate.HibernateSessionContextListener.class) ;
+ * </code></pre>
  *
  * <pre><code>
  *  &lt;session-factory>
@@ -59,6 +66,7 @@ import org.hibernate.cfg.AnnotationConfiguration;
  * the SessionFactory is stored as a class static member.
  *
  * @author henrichen
+ * @author <a href="mailto: deven.phillips@gmail.com">Deven Phillips</a>
  */
 public class HibernateUtil {
 	public static final String CONFIG = "HibernateUtil.config";

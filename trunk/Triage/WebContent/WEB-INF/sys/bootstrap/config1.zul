@@ -29,6 +29,8 @@
 	}
 
 	void saveConfig() {
+		// Create a new Hibernate AnnotationConfiguration and feed it the 
+		// configuration settings which the user ahas entered
 		org.hibernate.cfg.AnnotationConfiguration cfg = new org.hibernate.cfg.AnnotationConfiguration() ;
 		try {
 			cfg.setProperties(config)
@@ -46,6 +48,9 @@
 			} else {
 				desktop.getWebApp().setAttribute("hibernateSession",myFactory) ;
 			}
+
+			// Add the appropriate listeners to the application configuration
+			// so that Hibernate will operate properly in the ZK environment
 			desktop.getWebApp().getConfiguration().addListener(com.blogspot.devenphillips.helpdesk.zk.hibernate.HibernateSessionFactoryListener.class) ;
 			desktop.getWebApp().getConfiguration().addListener(com.blogspot.devenphillips.helpdesk.zk.hibernate.OpenSessionInViewListener.class) ;
 			desktop.getWebApp().getConfiguration().addListener(com.blogspot.devenphillips.helpdesk.zk.hibernate.HibernateSessionContextListener.class) ;
@@ -54,12 +59,17 @@
 			log.error("An error occurred while trying to created the database connection pool. The error message was '"+he.getLocalizedMessage()+"'. Please check your database settings and try again.",he) ;
 			Messagebox.show("An error occurred while trying to created the database connection pool. The error message was '"+he.getLocalizedMessage()+"'. Please check your database settings and try again.","Database Error",Messagebox.OK,Messagebox.ERROR) ;
 		}
+
+		// Store the hibernate Properties in the desktop object as an attribute for later use
 		desktop.setAttribute("config",config) ;
+
+		// Load the next step of the configuration process
 		desktop.getPage("indexZul").getFellow("workspace").getChildren().clear() ;
 		Executions.createComponents("WEB-INF/sys/bootstrap/config2.zul",desktop.getPage("indexZul").getFellow("workspace"),null) ;
 	}
 
 	void testDb() {
+		// Store the db configuration into the Properties object
 		if (!Properties.class.isInstance(config)) {
 			config = new Properties() ;
 			config.put("hibernate.c3p0.acquire_increment","1") ;
@@ -76,9 +86,11 @@
 			config.put("hibernate.show_sql","true") ;
 			config.put("hibernate.current_session_context_class","thread") ;
 		}
+
+		// Build a JDBC connection URL based on the user's input
 		String dbType = (String)dbtype.getSelectedItem().getValue() ;
 		String dbUrlStr = null ;
-		if (dbType.compareTo("pgsql")==0) {
+		if (dbType.compareTo("postgresql")==0) {
 			config.put("hibernate.connection.driver_class","org.postgresql.Driver") ;
 			config.put("hibernate.dialect","org.hibernate.dialect.PostgreSQLDialect") ;
 			dbUrlStr = "postgresql" ;
@@ -86,7 +98,7 @@
 			config.put("hibernate.connection.driver_class","com.mysql.jdbc.Driver") ;
 			config.put("hibernate.dialect","org.hibernate.dialect.MySQL5Dialect") ;
 			dbUrlStr = "mysql" ;
-		} else if (dbType.compareTo("mssql")==0) {
+		} else if (dbType.compareTo("sqlserver")==0) {
 			config.put("hibernate.connection.driver_class","com.microsoft.sqlserver.jdbc.SQLServerDriver") ;
 			config.put("hibernate.dialect","org.hibernate.dialect.SybaseDialect") ;
 			dbUrlStr = "sqlserver" ;
@@ -94,7 +106,7 @@
 			config.put("hibernate.connection.driver_class","com.ibm.db2.jdbc.app.DB2Driver") ;
 			config.put("hibernate.dialect","org.hibernate.dialect.DB2Dialect") ;
 			dbUrlStr = "db2" ;
-		} else if (dbType.compareTo("oracle")==0) {
+		} else if (dbType.compareTo("oracle:thin")==0) {
 			config.put("hibernate.connection.driver_class","oracle.jdbc.driver.OracleDriver") ;
 			config.put("hibernate.dialect","org.hibernate.dialect.OracleDialect") ;
 			dbUrlStr = "oracle:thin" ;
@@ -104,9 +116,12 @@
 		config.put("hibernate.connection.url","jdbc:"+dbUrlStr+"://"+dbhost.getValue()+"/"+dbname.getValue()) ;
 		config.put("hibernate.connection.username",dbuser.getValue()) ;
 		config.put("hibernate.connection.password",dbpass.getValue()) ;
+
+		// Prepare to test the database configuration and connection
 		boolean isConnected = true ;
 		String errorMessage = null ;
 		try {
+			// Attempt to load the database jdbc driver
 			Class.forName(config.get("hibernate.connection.driver_class"));
 		} catch (Exception e) {
 			errorMessage = "Unable to load JDBC driver for selected database. Make sure that you have placed the driver archive file(s) into the class path for your J2EE application server and restart the application server." ;
@@ -115,6 +130,7 @@
 		java.sql.Connection dbConnection = null ;
 		if (isConnected) {
 			try {
+				// Attempt to connect to the database using the provided configuration settings
 				dbConnection = java.sql.DriverManager.getConnection(
 						config.get("hibernate.connection.url"),
 						config.get("hibernate.connection.username"),
@@ -126,6 +142,7 @@
 		}
 		if (isConnected) {
 			try {
+				// Test the connection by running a test query
 				java.sql.Statement st = dbConnection.createStatement() ;
 				java.sql.ResultSet rs = st.executeQuery("SELECT '1' AS \"testval\"") ;
 				while (rs.next()) {
@@ -140,13 +157,15 @@
 				errorMessage = "Unable to run a test query against the database." ;
 			}
 		}
+
+		// If all tests succeed, the change the button to allow progress to the next step and save the settings
 		if (isConnected) {
 			dbConnection.close() ;
 			dbConnection = null ;
 			success.setVisible(true) ;
 			nextButton.setLabel("Step 2 >>") ;
 			dbIsGood = true ;
-		} else {
+		} else {	// Otherwise, show the user a userful error which might help get the settings corrected
 			Messagebox.show(errorMessage,"Database Error",Messagebox.OK,Messagebox.ERROR) ;
 		}
 	}
@@ -157,11 +176,11 @@
 		</vbox>
 		<vbox>
 			<listbox id="dbtype" rows="1" mold="select" onSelect="setRetest();" >
-				<listitem label="PostgreSQL" value="pgsql" selected="true"/>
+				<listitem label="PostgreSQL" value="postgresql" selected="true"/>
 				<listitem label="MySQL" value="mysql"/>
-				<listitem label="Microsoft SQL Server" value="mssql"/>
+				<listitem label="Microsoft SQL Server" value="sqlserver"/>
 				<listitem label="DB2" value="db2"/>
-				<listitem label="Oracle" value="oracle"/>
+				<listitem label="Oracle" value="oracle:thin"/>
 			</listbox>
 		</vbox>
 	</hbox>
