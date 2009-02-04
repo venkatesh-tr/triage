@@ -1,6 +1,9 @@
 package com.blogspot.devenphillips.helpdesk.data;
 
+import java.util.Set;
+
 import javax.persistence.* ;
+
 import org.hibernate.search.annotations.* ;
 
 @Entity
@@ -22,9 +25,14 @@ public class Device implements java.io.Serializable {
 	@Field(index=Index.TOKENIZED, store=Store.NO)
 	private String location = null ;
 
+	@ManyToMany( cascade = { CascadeType.PERSIST, CascadeType.REMOVE } )
+	@JoinTable(name="devicesoftware",joinColumns={@JoinColumn(name="deviceId",unique=false)},inverseJoinColumns={@JoinColumn(name="softwareId",unique=false)})
+	@IndexedEmbedded
+	private Set<Software> software = null ;
+
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="device_seq")
-	private int id = 0 ;
+	private int deviceId = 0 ;
 
 	public String getName() {
 		return name;
@@ -75,7 +83,15 @@ public class Device implements java.io.Serializable {
 	}
 
 	public int getId() {
-		return id;
+		return deviceId;
+	}
+
+	public void setSoftware(Set<Software> software) {
+		this.software = software;
+	}
+
+	public Set<Software> getSoftware() {
+		return software;
 	}
 
 }

@@ -40,6 +40,11 @@ public class Ticket implements java.io.Serializable {
 	private Set<Device> devices = null ;
 
 	@ManyToMany( cascade = { CascadeType.PERSIST, CascadeType.REMOVE } )
+	@JoinTable(name="usertickets",joinColumns={@JoinColumn(name="ticket",unique=false)},inverseJoinColumns={@JoinColumn(name="userId",unique=false)})
+	@IndexedEmbedded
+	private Set<User> users = null ;
+
+	@ManyToMany( cascade = { CascadeType.PERSIST, CascadeType.REMOVE } )
 	@JoinTable(name="ticketsoftware",joinColumns={@JoinColumn(name="software",unique=false)},inverseJoinColumns={@JoinColumn(name="ticket",unique=false)})
 	@IndexedEmbedded
 	private Set<Software> software = null ;
@@ -182,5 +187,13 @@ public class Ticket implements java.io.Serializable {
 
 	public void setSolution(Solution solution) {
 		this.solution = solution;
+	}
+
+	public void setUsers(Set<User> users) {
+		this.users = users;
+	}
+
+	public Set<User> getUsers() {
+		return users;
 	}
 }
