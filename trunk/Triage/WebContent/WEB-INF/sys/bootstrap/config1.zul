@@ -19,6 +19,7 @@
 
 	void setRetest() {
 		dbIsGood = false ;
+		success.setVisible(false) ;
 		StringBuffer urlStr = new StringBuffer() ;
 		urlStr.append("jdbc:") ;
 		urlStr.append(dbtype.getSelectedItem().getValue()) ;
@@ -77,7 +78,6 @@
 		config.put("hibernate.connection.url","jdbc:"+dbUrlStr+"://"+dbhost.getValue()+"/"+dbname.getValue()) ;
 		config.put("hibernate.connection.username",dbuser.getValue()) ;
 		config.put("hibernate.connection.password",dbpass.getValue()) ;
-		org.hibernate.cfg.AnnotationConfiguration cfg = new org.hibernate.cfg.AnnotationConfiguration() ;
 		boolean isConnected = true ;
 		String errorMessage = null ;
 		try {
@@ -96,6 +96,22 @@
 			} catch (Exception e) {
 				errorMessage = "Unable to connect to the database using the options provided. The error message was '"+e.getLocalizedMessage()+"'" ;
 				isConnected = false ;
+			}
+		}
+		if (isConnected) {
+			try {
+				java.sql.Statement st = dbConnection.createStatement() ;
+				java.sql.ResultSet rs = st.executeQuery("SELECT '1' AS \"testval\"") ;
+				while (rs.next()) {
+					int test = rs.getInt("testval") ;
+					if (test!=1) {
+						isConnected = false ;
+						errorMessage = "Unable to run a test query against the database." ;
+					}
+				}
+			} catch (Exception e) {
+				isConnected = false ;
+				errorMessage = "Unable to run a test query against the database." ;
 			}
 		}
 		if (isConnected) {
