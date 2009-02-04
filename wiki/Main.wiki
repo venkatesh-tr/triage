@@ -14,4 +14,4 @@
 
 = Status =
 
-     I have hardly even begun. So far I have an initial design for the data structure via Hibernate annotations. I have begun writing a configuration interface for first time log in. The initial data structures still need to be expanded to handle asset tracking and project management. None of the user interface has been written yet.
+     I have hardly even begun. So far I have an initial design for the data structure via Hibernate annotations. I have begun writing a configuration interface for first time log in. The initial data structures still need to be expanded to handle asset tracking and project management. A mock-up of the user interface has been started, but it is only for design testing purposes.
