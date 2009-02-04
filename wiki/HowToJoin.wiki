@@ -1,6 +1,6 @@
 #summary How To Join The Project
 
-First, I recommend you join our mailing list. You can do that by sending an e-mail to <a href="mailto:triage-devel-request@freelists.org">triage-devel-request@freelists.org</a> with the word "Subscribe" in the subject of the message.
+First, I recommend you join our mailing list. You can do that by sending an e-mail to triage-devel-request@freelists.org with the word "Subscribe" in the subject of the message.
 
 Second, download the source code and fire it up in <a href="http://www.eclipse.org">Eclipse</a>. You will probably want to have the ZK Studio plug-in for Eclipse from <a href="http://www.zkoss.org">ZKOSS.org</a>.
 
