@@ -1,6 +1,9 @@
 package com.blogspot.devenphillips.helpdesk.data;
 
+import java.util.Set;
+
 import javax.persistence.* ;
+
 import org.hibernate.search.annotations.* ;
 
 @Entity
@@ -14,7 +17,7 @@ public class User implements java.io.Serializable {
 	@Id
 	@DocumentId
 	@GeneratedValue(generator="device_seq",strategy=GenerationType.SEQUENCE)
-	private int record = 0 ;
+	private int userId = 0 ;
 
 	@Field(index=Index.TOKENIZED, store=Store.NO)
 	private String forename = null ;
@@ -25,6 +28,11 @@ public class User implements java.io.Serializable {
 	private String workphone = null ;
 	private String mobile = null ;
 	private String email = null ;
+
+	@ManyToMany( cascade = { CascadeType.PERSIST, CascadeType.REMOVE } )
+	@JoinTable(name="usergroups",joinColumns={@JoinColumn(name="userId",unique=false)},inverseJoinColumns={@JoinColumn(name="groupId",unique=false)})
+	@IndexedEmbedded
+	private Set<Group> groups = null ;
 
 	public String getForename() {
 		return forename;
@@ -63,7 +71,13 @@ public class User implements java.io.Serializable {
 		this.email = email;
 	}
 	public int getRecord() {
-		return record;
+		return userId;
+	}
+	public void setGroups(Set<Group> groups) {
+		this.groups = groups;
+	}
+	public Set<Group> getGroups() {
+		return groups;
 	}
 
 }

@@ -7,6 +7,7 @@
 	<zscript><![CDATA[
 	Properties config = null ;
 
+	org.zkoss.util.logging.Log log = org.zkoss.util.logging.Log.lookup(com.blogspot.devenphillips.helpdesk.zk.hibernate.HibernateUtil.class);
 	boolean dbIsGood = false ;
 
 	void buttonPressed() {
@@ -41,10 +42,12 @@
 				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.Solution.class)
 				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.Ticket.class)
 				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.TicketNote.class)
+				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.Group.class)
 				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.User.class) ;
 			org.hibernate.SessionFactory myFactory = cfg.buildSessionFactory() ;
 			if (myFactory==null) {
-				Messagebox.show("An error occurred while trying to created the Hibernate SessionFactory. The factory object was null. Please check your database settings and try again.","Database Error",Messagebox.OK,Messagebox.ERROR) ;
+				log.error("An error occurred while trying to create the Hibernate SessionFactory. The factory object was null. Please check your database settings and try again.") ;
+				Messagebox.show("An error occurred while trying to create the Hibernate SessionFactory. The factory object was null. Please check your database settings and try again.","Database Error",Messagebox.OK,Messagebox.ERROR) ;
 			} else {
 				desktop.getWebApp().setAttribute("hibernateSession",myFactory) ;
 			}
@@ -55,9 +58,8 @@
 			desktop.getWebApp().getConfiguration().addListener(com.blogspot.devenphillips.helpdesk.zk.hibernate.OpenSessionInViewListener.class) ;
 			desktop.getWebApp().getConfiguration().addListener(com.blogspot.devenphillips.helpdesk.zk.hibernate.HibernateSessionContextListener.class) ;
 		} catch (Exception he) {
-			org.zkoss.util.logging.Log log = org.zkoss.util.logging.Log.lookup(com.blogspot.devenphillips.helpdesk.zk.hibernate.HibernateUtil.class);
-			log.error("An error occurred while trying to created the database connection pool. The error message was '"+he.getLocalizedMessage()+"'. Please check your database settings and try again.",he) ;
-			Messagebox.show("An error occurred while trying to created the database connection pool. The error message was '"+he.getLocalizedMessage()+"'. Please check your database settings and try again.","Database Error",Messagebox.OK,Messagebox.ERROR) ;
+			log.error("An error occurred while trying to create the database connection pool. The error message was '"+he.getLocalizedMessage()+"'. Please check your database settings and try again.",he) ;
+			Messagebox.show("An error occurred while trying to create the database connection pool. The error message was '"+he.getLocalizedMessage()+"'. Please check your database settings and try again.","Database Error",Messagebox.OK,Messagebox.ERROR) ;
 		}
 
 		// Store the hibernate Properties in the desktop object as an attribute for later use
@@ -125,6 +127,7 @@
 			Class.forName(config.get("hibernate.connection.driver_class"));
 		} catch (Exception e) {
 			errorMessage = "Unable to load JDBC driver for selected database. Make sure that you have placed the driver archive file(s) into the class path for your J2EE application server and restart the application server." ;
+			log.error(errorMessage,e) ;
 			isConnected = false ;
 		}
 		java.sql.Connection dbConnection = null ;
@@ -137,6 +140,7 @@
 						config.get("hibernate.connection.password")) ;
 			} catch (Exception e) {
 				errorMessage = "Unable to connect to the database using the options provided. The error message was '"+e.getLocalizedMessage()+"'" ;
+				log.error(errorMessage,e) ;
 				isConnected = false ;
 			}
 		}
@@ -155,6 +159,7 @@
 			} catch (Exception e) {
 				isConnected = false ;
 				errorMessage = "Unable to run a test query against the database." ;
+				log.error(errorMessage,e) ;
 			}
 		}
 
@@ -166,7 +171,7 @@
 			nextButton.setLabel("Step 2 >>") ;
 			dbIsGood = true ;
 		} else {	// Otherwise, show the user a userful error which might help get the settings corrected
-			Messagebox.show(errorMessage,"Database Error",Messagebox.OK,Messagebox.ERROR) ;
+			Messagebox.show(errorMessage+"Relevent portions of the error have been logged.","Database Error",Messagebox.OK,Messagebox.ERROR) ;
 		}
 	}
 	]]></zscript>
@@ -189,7 +194,7 @@
 			<label value="Database Host[:Port]: "/>
 		</vbox>
 		<vbox>
-			<textbox id="dbhost" width="160px" onChange="setRetest();"/>
+			<textbox id="dbhost" width="160px" onCreate="self.setFocus(true)" onChange="setRetest();"/>
 		</vbox>
 	</hbox>
 	<hbox>

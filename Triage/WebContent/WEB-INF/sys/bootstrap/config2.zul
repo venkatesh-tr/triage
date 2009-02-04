@@ -5,6 +5,7 @@
 		</hbox>
 	</window>
 	<zscript><![CDATA[
+	
 	void saveConfig() {
 		String authType = authtype.getSelectedItem().getValue() ;
 		Properties config = (Properties)desktop.getAttribute("config") ;
@@ -15,7 +16,13 @@
 			config.put("auth.ad.adminuser",adadminuser.getValue()) ;
 			config.put("auth.ad.adminpass",adadminpass.getValue()) ;
 			config.put("auth.ad.basedn",adbasedn.getValue()) ;
-			config.put("auth.ad.useSSL",adUseSSL.isChecked()) ;
+			String useSSLString = null ;
+			if (adUseSSL.isChecked()) {
+				useSSLString = "true" ;
+			} else {
+				useSSLString = "false" ;
+			}
+			config.put("auth.ad.useSSL",useSSLString) ;
 		} else if (authType.contains("sql")) {
 			config.put("auth.type","sql") ;
 		} else {

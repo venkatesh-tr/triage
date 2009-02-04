@@ -19,13 +19,10 @@ Copyright (C) 2006 Potix Corporation. All Rights Reserved.
 package com.blogspot.devenphillips.helpdesk.zk.hibernate;
 
 import org.zkoss.zk.ui.Execution;
-import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.util.ExecutionInit;
 import org.zkoss.zk.ui.util.ExecutionCleanup;
 import org.zkoss.util.logging.Log;
-
 import org.hibernate.StaleObjectStateException;
-
 import java.util.List;
 
 /**
@@ -56,6 +53,7 @@ public class OpenSessionInViewListener implements ExecutionInit, ExecutionCleanu
 	}
 	
 	//-- ExecutionCleanup --//
+	@SuppressWarnings("unchecked")
 	public void cleanup(Execution exec, Execution parent, List errs) {
 		if (parent == null) { //the root execution of a servlet request
 			try {

@@ -20,22 +20,18 @@ package com.blogspot.devenphillips.helpdesk.zk.hibernate;
 
 import org.zkoss.zkplus.util.ThreadLocals;
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.WebApp;
-import org.zkoss.zk.ui.util.Configuration;
 import org.zkoss.zk.ui.util.ExecutionInit;
 import org.zkoss.zk.ui.util.ExecutionCleanup;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventThreadInit;
 import org.zkoss.zk.ui.event.EventThreadResume;
-import org.zkoss.lang.Classes;
 import org.zkoss.util.logging.Log;
 
 import java.util.Map;
 import java.util.HashMap;
-import java.lang.reflect.Field;
 
 import java.util.List;
 /**
@@ -60,6 +56,7 @@ import java.util.List;
  * @author henrichen
  */
 public class HibernateSessionContextListener implements ExecutionInit, ExecutionCleanup, EventThreadInit, EventThreadResume {
+	@SuppressWarnings("unused")
 	private static final Log log = Log.lookup(HibernateSessionContextListener.class);
 	private static final String HIBERNATE_SESSION_MAP = "org.zkoss.zkplus.hibernate.SessionMap";
 	private static final Object SOMETHING = new Object();
@@ -72,6 +69,7 @@ public class HibernateSessionContextListener implements ExecutionInit, Execution
 	}
 	
 	//-- ExecutionInit --//
+	@SuppressWarnings("unchecked")
 	public void init(Execution exec, Execution parent) {
 		if (_enabled) {
 			if (parent == null) { //root execution
@@ -92,6 +90,7 @@ public class HibernateSessionContextListener implements ExecutionInit, Execution
 	}
 	
 	//-- ExecutionCleanup --//
+	@SuppressWarnings("unchecked")
 	public void cleanup(Execution exec, Execution parent, List errs) {
 		if (_enabled) {
 			if (parent == null) { //root execution
@@ -113,6 +112,7 @@ public class HibernateSessionContextListener implements ExecutionInit, Execution
 		//do nothing
 	}
 	
+	@SuppressWarnings("unchecked")
 	public boolean init(Component comp, Event evt) {
 		if (_enabled) {
 			//Copy SessionMap stored in Execution attribute into event's ThreadLocal
@@ -127,6 +127,7 @@ public class HibernateSessionContextListener implements ExecutionInit, Execution
 		//do nothing
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void afterResume(Component comp, Event evt) {
 		if (_enabled) {
 			//always keep the prepared SessionMap in event's ThreadLocal
@@ -140,14 +141,17 @@ public class HibernateSessionContextListener implements ExecutionInit, Execution
 	}
 	
 	//-- utilities --//
+	@SuppressWarnings("unchecked")
 	private void setSessionMap(Map map) {
 		getContextThreadLocal().set(map);
 	}
 	
+	@SuppressWarnings("unchecked")
 	private Map getSessionMap() {
 		return (Map) getContextThreadLocal().get();
 	}
 	
+	@SuppressWarnings("unchecked")
 	private ThreadLocal getContextThreadLocal() {
 		return ThreadLocals.getThreadLocal("org.hibernate.context.ThreadLocalSessionContext", "context");
 	}
