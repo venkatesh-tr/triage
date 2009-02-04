@@ -30,10 +30,10 @@ public class Bootstrap extends GenericServlet {
 		try {
 			config.load(new FileInputStream("helpdesk.properties")) ;
 		} catch (FileNotFoundException e) {
-			this.getServletContext().log("Error loading properties file. Application is not yet configured.",e) ;
+			this.getServletContext().log("Error loading properties file. Application is not yet configured.") ;
 			isConfigured = false ;
 		} catch (IOException e) {
-			this.getServletContext().log("Error loading properties file. Application is not yet configured.",e) ;
+			this.getServletContext().log("Error loading properties file. Application is not yet configured.") ;
 			isConfigured = false ;
 		}
 

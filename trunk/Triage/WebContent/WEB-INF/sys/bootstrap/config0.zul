@@ -1,0 +1,26 @@
+<vbox width="100%">
+	<zscript><![CDATA[
+	void nextStep() {
+		desktop.getPage("indexZul").getFellow("workspace").getChildren().clear() ;
+		Executions.createComponents("WEB-INF/sys/bootstrap/config1.zul",desktop.getPage("indexZul").getFellow("workspace"),null) ;
+	}
+	]]></zscript>
+	<window id="header" width="100%" height="90px" top="2px" style="background: #83B5F7;" left="2px">
+		<hbox>
+			<image src="images/triage.png"/>
+		</hbox>
+	</window>
+	<label value="Triage Configuration" style="font-size: 24pt; font-weight: bold;" />
+	<hbox width="600px">
+		<html><![CDATA[
+		&nbsp;&nbsp;&nbsp;&nbsp;This is the first time you have tried to launch Triage. The next few screens 
+		will walk you through the steps required to configure the application for
+		use. These steps include setting up a database connection, authentication,
+		and various other options. Click the "Next" button below to begin the 
+		configuration.
+		]]></html> 
+	</hbox>
+	<hbox>
+		<button onClick="nextStep()" label="Next >>"/>
+	</hbox>
+</vbox>
