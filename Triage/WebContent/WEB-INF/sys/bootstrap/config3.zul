@@ -1,4 +1,9 @@
-<vbox>
+<vbox width="100%">
+	<window id="header" width="100%" height="90px" top="2px" style="background: #83B5F7;" left="2px">
+		<hbox>
+			<image src="images/triage.png"/>
+		</hbox>
+	</window>
 	<zscript><![CDATA[
 	void saveConfig() {
 		

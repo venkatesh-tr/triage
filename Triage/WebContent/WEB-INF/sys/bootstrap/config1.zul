@@ -1,4 +1,9 @@
-<vbox>
+<vbox width="100%">
+	<window id="header" width="100%" height="90px" top="2px" style="background: #83B5F7;" left="2px">
+		<hbox>
+			<image src="images/triage.png"/>
+		</hbox>
+	</window>
 	<zscript><![CDATA[
 	Properties config = null ;
 
@@ -14,53 +19,15 @@
 
 	void setRetest() {
 		dbIsGood = false ;
+		StringBuffer urlStr = new StringBuffer() ;
+		urlStr.append("jdbc:") ;
+		urlStr.append(dbtype.getSelectedItem().getValue()) ;
+		urlStr.append("://"+dbhost.getValue()+"/"+dbname.getValue()) ;
+		jdbcUrl.setValue(urlStr.toString()) ;
 		nextButton.setLabel("Test Connection") ;
 	}
 
 	void saveConfig() {
-		if (!config.getClass().isInstance(Properties.class)) {
-			config = new Properties() ;
-			config.put("hibernate.c3p0.acquire_increment","1") ;
-			config.put("hibernate.c3p0.idle_test_period","300") ;
-			config.put("hibernate.c3p0.max_size","100") ;
-			config.put("hibernate.c3p0.max_statements","0") ;
-			config.put("hibernate.c3p0.min_size","5") ;
-			config.put("hibernate.c3p0.timeout","100") ;
-			config.put("hibernate.c3p0.preferredTestQuery","SELECT 1") ;
-			config.put("hibernate.hbm2ddl.auto","update") ;
-			config.put("hibernate.connection.provider_class","org.hibernate.connection.C3P0ConnectionProvider") ;
-			config.put("hibernate.search.default.directory_provider","org.hibernate.search.store.FSDirectoryProvider") ;
-			config.put("hibernate.search.default.indexBase","/var/lucene/indexes") ;
-			config.put("hibernate.show_sql","true") ;
-		}
-		String dbType = dbtype.getSelectedItem().getValue() ;
-		String dbUrlStr = null ;
-		if (dbType.compareTo("pgsql")==0) {
-			config.put("hibernate.connection.driver_class","org.postgresql.Driver") ;
-			config.put("hibernate.dialect","org.hibernate.dialect.PostgreSQLDialect") ;
-			dbUrlStr = "postgresql" ;
-		} else if (dbType.compareTo("mysql")==0) {
-			config.put("hibernate.connection.driver_class","com.mysql.jdbc.Driver") ;
-			config.put("hibernate.dialect","org.hibernate.dialect.MySQL5Dialect") ;
-			dbUrlStr = "mysql" ;
-		} else if (dbType.compareTo("mssql")==0) {
-			config.put("hibernate.connection.driver_class","com.microsoft.sqlserver.jdbc.SQLServerDriver") ;
-			config.put("hibernate.dialect","org.hibernate.dialect.SybaseDialect") ;
-			dbUrlStr = "sqlserver" ;
-		} else if (dbType.compareTo("db2")==0) {
-			config.put("hibernate.connection.driver_class","com.ibm.db2.jdbc.app.DB2Driver") ;
-			config.put("hibernate.dialect","org.hibernate.dialect.DB2Dialect") ;
-			dbUrlStr = "db2" ;
-		} else if (dbType.compareTo("oracle")==0) {
-			config.put("hibernate.connection.driver_class","oracle.jdbc.driver.OracleDriver") ;
-			config.put("hibernate.dialect","org.hibernate.dialect.OracleDialect") ;
-			dbUrlStr = "oracle:thin" ;
-		} else {
-			Messagebox.show("For some reason the database type selection failed. Please re-select the database type and try again.","ERROR",Messagebox.OK,Messagebox.ERROR) ;
-		}
-		config.put("hibernate.connection.url","jdbc:"+dbUrlStr+"://"+dbhost.getValue()+"/"+dbname.getValue()) ;
-		config.put("hibernate.connection.username",dbuser.getValue()) ;
-		config.put("hibernate.connection.password",dbpass.getValue()) ;
 		desktop.setAttribute("config",config) ;
 		desktop.getPage("indexZul").getFellow("workspace").getChildren().clear() ;
 		Executions.createComponents("WEB-INF/sys/bootstrap/config2.zul",desktop.getPage("indexZul").getFellow("workspace"),null) ;
@@ -112,25 +79,33 @@
 		config.put("hibernate.connection.password",dbpass.getValue()) ;
 		org.hibernate.cfg.AnnotationConfiguration cfg = new org.hibernate.cfg.AnnotationConfiguration() ;
 		boolean isConnected = true ;
+		String errorMessage = null ;
 		try {
-			cfg.setProperties(config)
-				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.Software.class)
-				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.Request.class)
-				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.RequestNote.class)
-				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.Device.class)
-				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.Solution.class)
-				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.Ticket.class)
-				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.TicketNote.class)
-				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.User.class) ;
-			org.hibernate.SessionFactory sessFactory = cfg.buildSessionFactory() ;
-		} catch (Exception he) {
+			Class.forName(config.get("hibernate.connection.driver_class"));
+		} catch (Exception e) {
+			errorMessage = "Unable to load JDBC driver for selected database. Make sure that you have placed the driver archive file(s) into the class path for your J2EE application server and restart the application server." ;
 			isConnected = false ;
-			Messagebox.show("An error occurred while trying to connect to the database. The error message was '"+he.getLocalizedMessage()+"'. Please check your database settings and try again.","Database Error",Messagebox.OK,Messagebox.ERROR) ;
+		}
+		java.sql.Connection dbConnection = null ;
+		if (isConnected) {
+			try {
+				dbConnection = java.sql.DriverManager.getConnection(
+						config.get("hibernate.connection.url"),
+						config.get("hibernate.connection.username"),
+						config.get("hibernate.connection.password")) ;
+			} catch (Exception e) {
+				errorMessage = "Unable to connect to the database using the options provided. The error message was '"+e.getLocalizedMessage()+"'" ;
+				isConnected = false ;
+			}
 		}
 		if (isConnected) {
+			dbConnection.close() ;
+			dbConnection = null ;
 			success.setVisible(true) ;
 			nextButton.setLabel("Step 2 >>") ;
 			dbIsGood = true ;
+		} else {
+			Messagebox.show(errorMessage,"Database Error",Messagebox.OK,Messagebox.ERROR) ;
 		}
 	}
 	]]></zscript>
@@ -150,10 +125,10 @@
 	</hbox>
 	<hbox>
 		<vbox width="160px">
-			<label value="Database Host: "/>
+			<label value="Database Host[:Port]: "/>
 		</vbox>
 		<vbox>
-			<textbox id="dbhost" width="160px" onChanging="setRetest();"/>
+			<textbox id="dbhost" width="160px" onChange="setRetest();"/>
 		</vbox>
 	</hbox>
 	<hbox>
@@ -161,7 +136,7 @@
 			<label value="Database Name: "/>
 		</vbox>
 		<vbox>
-			<textbox id="dbname" width="160px" onChanging="setRetest();"/>
+			<textbox id="dbname" width="160px" onChange="setRetest();"/>
 		</vbox>
 	</hbox>
 	<hbox>
@@ -169,7 +144,7 @@
 			<label value="Database User: "/>
 		</vbox>
 		<vbox>
-			<textbox id="dbuser" width="160px" onChanging="setRetest();"/>
+			<textbox id="dbuser" width="160px" onChange="setRetest();"/>
 		</vbox>
 	</hbox>
 	<hbox>
@@ -177,8 +152,11 @@
 			<label value="Database Password: "/>
 		</vbox>
 		<vbox>
-			<textbox id="dbpass" type="password" value="" width="160px" onChanging="setRetest();"/>
+			<textbox id="dbpass" type="password" value="" width="160px" onChange="setRetest();"/>
 		</vbox>
+	</hbox>
+	<hbox>
+		<label id="jdbcUrl" style="font-weight: bold; color: blue;" />
 	</hbox>
 	<hbox align="center">
 		<vbox width="160px">

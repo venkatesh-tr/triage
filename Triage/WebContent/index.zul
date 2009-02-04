@@ -9,9 +9,11 @@
 
 	void init() {
 		if (isConfigured) {
-			
+			desktop.getWebApp().getConfiguration().addListener(org.zkoss.zkplus.hibernate.HibernateSessionFactoryListener.class) ;
+			desktop.getWebApp().getConfiguration().addListener(org.zkoss.zkplus.hibernate.OpenSessionInViewListener.class) ;
+			desktop.getWebApp().getConfiguration().addListener(org.zkoss.zkplus.hibernate.HibernateSessionContextListener.class) ;
 		} else {
-			Executions.createComponents("WEB-INF/sys/bootstrap/config1.zul",workspace,null) ;
+			Executions.createComponents("WEB-INF/sys/bootstrap/config0.zul",workspace,null) ;
 		}
 	}
 	]]></zscript>

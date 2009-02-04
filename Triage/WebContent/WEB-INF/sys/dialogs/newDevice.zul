@@ -1,3 +1,3 @@
-<window id="newDevice" top="120px" left="140px" defaultActionOnShow="slideDown" closable="true" title="New Device" width="400px" height="300px" border="normal" mode="overlapped">
+<window minimizable="true" id="newDevice" sizable="true" top="120px" left="140px" defaultActionOnShow="slideDown" closable="true" title="New Device" width="400px" height="300px" border="normal" mode="overlapped">
 	<label value="New Device Entry"/>
 </window>

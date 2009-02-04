@@ -1,7 +1,4 @@
 <hbox id="main" width="100%" height="100%" onClientInfo="setFooterLocation()">
-<style>
-
-</style>
 	<zscript><![CDATA[
 	void newDevice() {
 		AbstractComponent currWindow = main.getFellowIfAny("newDevice") ;
@@ -50,7 +47,7 @@
 		}
 	}
 	]]></zscript>
-	<window id="navigation" title="Navigation" width="120px" height="250px" minheight="250" defaultActionOnShow="slideDown" mode="overlapped" sizable="true" top="94px" left="10px">
+	<window id="navigation" title="Navigation" width="120px" height="250px" defaultActionOnShow="slideDown" mode="overlapped" sizable="false" top="94px" left="10px">
 		<vbox>
 			<label value="My Tickets" onClick="myTickets()"/>
 			<label value="New Ticket" onClick="newTicket()"/>
@@ -62,12 +59,12 @@
 			<label value="Work History"/>
 		</vbox>
 	</window>
-	<window id="header" width="100%" height="90px" top="2px" style="background: #B6B6B6;" left="2px">
+	<window id="header" width="100%" height="90px" top="2px" style="background: #83B5F7;" left="2px">
 		<hbox>
 			<image src="images/triage.png"/>
 		</hbox>
 	</window>
-	<window mode="overlapped" left="2px" id="footer" border="normal" width="95%" height="40px">
+	<window visible="false" mode="overlapped" left="2px" id="footer" border="normal" width="95%" height="40px">
 		<hbox>
 			<label value="Footer"/>
 		</hbox>

@@ -25,21 +25,21 @@
 	</system-config>
 	-->
 
-	<!-- Hibernate SessionFactory lifecycle -->
+	<!-- Hibernate SessionFactory lifecycle
 	<listener>
 		<description>Hibernate SessionFactory lifecycle</description>
 		<listener-class>org.zkoss.zkplus.hibernate.HibernateSessionFactoryListener</listener-class>
 	</listener>
 	
-	<!-- Hibernate OpenSessionInView Pattern -->
+	 Hibernate OpenSessionInView Pattern
 	<listener>
 		<description>Hibernate Open Session In View lifecycle</description>
 		<listener-class>org.zkoss.zkplus.hibernate.OpenSessionInViewListener</listener-class>
 	</listener>
 
-	<!-- Hibernate thread sesson context handler -->
+	 Hibernate thread sesson context handler
 	<listener>
 		<description>Hibernate thread session context handler</description>
 		<listener-class>org.zkoss.zkplus.hibernate.HibernateSessionContextListener</listener-class>
-	</listener>
+	</listener> -->
 </zk>
