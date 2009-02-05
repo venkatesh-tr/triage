@@ -7,35 +7,54 @@
 	<zscript><![CDATA[
 	
 	void saveConfig() {
-		String authType = authtype.getSelectedItem().getValue() ;
-		Properties config = (Properties)desktop.getAttribute("config") ;
-		if (authType.contains("ad")) {
-			config.put("auth.type","ad") ;
-			config.put("auth.ad.domaincontroller",addc.getValue()) ;
-			config.put("auth.ad.domain",addomain.getValue()) ;
-			config.put("auth.ad.adminuser",adadminuser.getValue()) ;
-			config.put("auth.ad.adminpass",adadminpass.getValue()) ;
-			config.put("auth.ad.basedn",adbasedn.getValue()) ;
-			String useSSLString = null ;
-			if (adUseSSL.isChecked()) {
-				useSSLString = "true" ;
+		if (nextButton.getLabel().contains("Test")) {
+			String authType = authtype.getSelectedItem().getValue() ;
+			Properties config = (Properties)desktop.getAttribute("config") ;
+			if (authType.contains("ad")) {
+				config.put("auth.type","ad") ;
+				config.put("auth.ad.domaincontroller",addc.getValue()) ;
+				config.put("auth.ad.domain",addomain.getValue()) ;
+				config.put("auth.ad.adminuser",adadminuser.getValue()) ;
+				config.put("auth.ad.adminpass",adadminpass.getValue()) ;
+				config.put("auth.ad.basedn",adbasedn.getValue()) ;
+				String useSSLString = null ;
+				if (adUseSSL.isChecked()) {
+					useSSLString = "true" ;
+				} else {
+					useSSLString = "false" ;
+				}
+				config.put("auth.ad.useSSL",useSSLString) ;
+				com.blogspot.devenphillips.helpdesk.auth.plugins.ActiveDirectoryProvider adProvider = new com.blogspot.devenphillips.helpdesk.auth.plugins.ActiveDirectoryProvider(config) ;
+				if (!adProvider.authenticate(adadminuser.getValue(),adadminpass.getValue())) {
+					Messagebox.show("Unable to authenticate with admin user and password.","Active Directory Error",Messagebox.OK,Messagebox.ERROR) ;
+				} else {
+					nextButton.setLabel("Step 3 >>") ;
+					successBox.setVisible(true) ;
+				}
+			} else if (authType.contains("sql")) {
+				config.put("auth.type","sql") ;
+				config.put("auth.sql.adminuser",sqladmin.getValue()) ;
+				config.put("auth.sql.adminpass",sqlpass.getValue()) ;
+				com.blogspot.devenphillips.helpdesk.auth.plugins.SQLAuthProvider sqlProvider = new com.blogspot.devenphillips.helpdesk.auth.plugins.SQLAuthProvider(config) ;
+				if (!adProvider.authenticate(adadminuser.getValue(),adadminpass.getValue())) {
+					Messagebox.show("Unable to authenticate with admin user and password.","SQL Authentication Error",Messagebox.OK,Messagebox.ERROR) ;
+				} else {
+					nextButton.setLabel("Step 3 >>") ;
+					successBox.setVisible(true) ;
+				}
 			} else {
-				useSSLString = "false" ;
+				config.put("auth.type","ldap") ;
+				config.put("auth.ldap.server",ldapdc.getValue()) ;
+				config.put("auth.ldap.domain",ldapdomain.getValue()) ;
+				config.put("auth.ldap.adminuser",ldapadminuser.getValue()) ;
+				config.put("auth.ldap.adminpass",ldapadminpass.getValue()) ;
+				config.put("auth.ldap.basedn",ldapbasedn.getValue()) ;
+				config.put("auth.ldap.useSSL",ldapUseSSL.isChecked()) ;
 			}
-			config.put("auth.ad.useSSL",useSSLString) ;
-		} else if (authType.contains("sql")) {
-			config.put("auth.type","sql") ;
 		} else {
-			config.put("auth.type","ldap") ;
-			config.put("auth.ldap.server",ldapdc.getValue()) ;
-			config.put("auth.ldap.domain",ldapdomain.getValue()) ;
-			config.put("auth.ldap.adminuser",ldapadminuser.getValue()) ;
-			config.put("auth.ldap.adminpass",ldapadminpass.getValue()) ;
-			config.put("auth.ldap.basedn",ldapbasedn.getValue()) ;
-			config.put("auth.ldap.useSSL",ldapUseSSL.isChecked()) ;
+			desktop.getPage("indexZul").getFellow("workspace").getChildren().clear() ;
+			Executions.createComponents("WEB-INF/sys/bootstrap/config3.zul",desktop.getPage("indexZul").getFellow("workspace"),null) ;
 		}
-		desktop.getPage("indexZul").getFellow("workspace").getChildren().clear() ;
-		Executions.createComponents("WEB-INF/sys/bootstrap/config3.zul",desktop.getPage("indexZul").getFellow("workspace"),null) ;
 	}
 
 	void showAuthParams() {
@@ -110,7 +129,22 @@
 		</hbox>
 	</vbox>
 	<vbox id="sql" visible="false">
-		<label value="You chose SQL authentication, nothing more to configure!"/>
+		<hbox>
+			<vbox width="220px">
+				<label value="Admin Username: "/>
+			</vbox>
+			<vbox>
+				<textbox id="sqladmin"/>
+			</vbox>
+		</hbox>
+		<hbox>
+			<vbox width="220px">
+				<label value="Admin Password: "/>
+			</vbox>
+			<vbox>
+				<textbox id="sqlpass"/>
+			</vbox>
+		</hbox>
 	</vbox>
 	<vbox id="ldap" visible="false">
 		<hbox>
@@ -154,7 +188,10 @@
 			</vbox>
 		</hbox>
 	</vbox>
+	<hbox align="center" id="successBox" visible="false">
+		<label style="color: #66FF66;" value="Authentication works" />
+	</hbox>
 	<hbox align="center">
-		<button onClick="saveConfig();" label="Step 3 &gt;&gt;"/>
+		<button id="nextButton" onClick="saveConfig();" label="Test Authentication"/>
 	</hbox>
 </vbox>
