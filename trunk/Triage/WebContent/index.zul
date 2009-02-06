@@ -5,6 +5,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
 	<zscript><![CDATA[
+	// Check to see if the application has already been configured
 	boolean isConfigured = (application.getAttribute("isConfigured").compareTo("true")==0) ;
 
 	void init() {
