@@ -7,3 +7,5 @@
 [http://java.sun.com/ Java] - A programming language which is designed to be cross platform and high performance
 
 [http://www.eclipse.org/ Eclipse] - A Java based development environment originally designed by IBM.
+
+[http://lucene.apache.org/java/docs/ Lucene] - A Java based library and framework for performing full-text indexes and searches.
