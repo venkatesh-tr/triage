@@ -1,0 +1,9 @@
+#summary Useful links to external web sites which are relevant to the Triage project
+
+[Hibernate http://www.hibernate.org/]
+
+[ZK http://www.zkoss.org/]
+
+[Java http://java.sun.com/]
+
+[Eclipse http://www.eclipse.org/]
