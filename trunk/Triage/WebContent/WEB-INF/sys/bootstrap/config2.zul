@@ -108,7 +108,7 @@
 				<label value="Domain Admin Password: "/>
 			</vbox>
 			<vbox>
-				<textbox id="adadminpass" width="220px"/>
+				<textbox id="adadminpass" type="password" width="220px"/>
 			</vbox>
 		</hbox>
 		<hbox>
