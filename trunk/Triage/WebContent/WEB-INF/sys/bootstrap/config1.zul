@@ -78,22 +78,24 @@
 	void testDb() {
 		// Store the db configuration into the Properties object
 		if (!Properties.class.isInstance(config)) {
-			config = null ;
 			config = new Properties() ;
-			config.put("hibernate.c3p0.acquire_increment","1") ;
-			config.put("hibernate.c3p0.idle_test_period","300") ;
-			config.put("hibernate.c3p0.max_size","100") ;
-			config.put("hibernate.c3p0.max_statements","0") ;
-			config.put("hibernate.c3p0.min_size","5") ;
-			config.put("hibernate.c3p0.timeout","100") ;
-			config.put("hibernate.c3p0.preferredTestQuery","SELECT 1") ;
-			config.put("hibernate.hbm2ddl.auto","update") ;
-			config.put("hibernate.connection.provider_class","org.hibernate.connection.C3P0ConnectionProvider") ;
-			config.put("hibernate.search.default.directory_provider","org.hibernate.search.store.FSDirectoryProvider") ;
-			config.put("hibernate.search.default.indexBase",luceneDir.getValue()) ;
-			config.put("hibernate.show_sql","true") ;
-			config.put("hibernate.current_session_context_class","thread") ;
+		} else {
+			config.clear() ;
 		}
+		config.put("hibernate.c3p0.acquire_increment","1") ;
+		config.put("hibernate.c3p0.idle_test_period","300") ;
+		config.put("hibernate.c3p0.max_size","100") ;
+		config.put("hibernate.c3p0.max_statements","0") ;
+		config.put("hibernate.c3p0.min_size","5") ;
+		config.put("hibernate.c3p0.timeout","100") ;
+		config.put("hibernate.c3p0.preferredTestQuery","SELECT 1") ;
+		config.put("hibernate.hbm2ddl.auto","update") ;
+		config.put("hibernate.connection.provider_class","org.hibernate.connection.C3P0ConnectionProvider") ;
+		config.put("hibernate.search.default.directory_provider","org.hibernate.search.store.FSDirectoryProvider") ;
+		config.put("hibernate.search.default.indexBase",luceneDir.getValue()) ;
+		config.put("hibernate.show_sql","true") ;
+		config.put("hibernate.current_session_context_class","thread") ;
+
 		String errorMessage = null ;
 
 		// Prepare to test the database configuration and connection
