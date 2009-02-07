@@ -1,9 +1,9 @@
 #summary Useful links to external web sites which are relevant to the Triage project
 
-[http://www.hibernate.org/ Hibernate]
+[http://www.hibernate.org/ Hibernate] - A Java based database persistence library
 
-[http://www.zkoss.org/ ZK]
+[http://www.zkoss.org/ ZK] - A Java based framework for Rich Internet Applications (AJAX)
 
-[http://java.sun.com/ Java]
+[http://java.sun.com/ Java] - A programming language which is designed to be cross platform and high performance
 
-[http://www.eclipse.org/ Eclipse]
+[http://www.eclipse.org/ Eclipse] - A Java based development environment originally designed by IBM.
