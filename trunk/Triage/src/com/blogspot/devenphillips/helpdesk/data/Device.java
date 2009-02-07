@@ -1,9 +1,7 @@
 package com.blogspot.devenphillips.helpdesk.data;
 
 import java.util.Set;
-
 import javax.persistence.* ;
-
 import org.hibernate.search.annotations.* ;
 
 @Entity

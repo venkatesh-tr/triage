@@ -18,6 +18,10 @@
 		}
 	}
 
+	void closeInstructions() {
+		initInstructions.detach() ;
+	}
+
 	void setRetest() {
 		dbIsGood = false ;
 		success.setVisible(false) ;
@@ -43,6 +47,7 @@
 				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.Ticket.class)
 				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.TicketNote.class)
 				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.Group.class)
+				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.Preference.class)
 				.addAnnotatedClass(com.blogspot.devenphillips.helpdesk.data.User.class) ;
 			org.hibernate.SessionFactory myFactory = cfg.buildSessionFactory() ;
 			if (myFactory==null) {
@@ -73,6 +78,7 @@
 	void testDb() {
 		// Store the db configuration into the Properties object
 		if (!Properties.class.isInstance(config)) {
+			config = null ;
 			config = new Properties() ;
 			config.put("hibernate.c3p0.acquire_increment","1") ;
 			config.put("hibernate.c3p0.idle_test_period","300") ;
@@ -84,52 +90,91 @@
 			config.put("hibernate.hbm2ddl.auto","update") ;
 			config.put("hibernate.connection.provider_class","org.hibernate.connection.C3P0ConnectionProvider") ;
 			config.put("hibernate.search.default.directory_provider","org.hibernate.search.store.FSDirectoryProvider") ;
-			config.put("hibernate.search.default.indexBase","/var/lucene/indexes") ;
+			config.put("hibernate.search.default.indexBase",luceneDir.getValue()) ;
 			config.put("hibernate.show_sql","true") ;
 			config.put("hibernate.current_session_context_class","thread") ;
+		}
+		String errorMessage = null ;
+
+		// Prepare to test the database configuration and connection
+		boolean isConnected = true ;
+
+		// Check to ensure that the lucene index directory exists. If it does not, prompt user for permission to create it.
+		String indexDir = config.get("hibernate.search.default.indexBase") ;
+		java.io.File indexDirObj = new java.io.File(indexDir) ;
+
+		if (indexDirObj.exists()) {
+			if (indexDirObj.isDirectory()) {
+				if (indexDirObj.canWrite()) {
+					isConnected = true ;
+				} else {
+					isConnected = false ;
+					errorMessage = "Permission denied for index directory '"+indexDir+"'" ;
+				}
+			} else {
+				Messagebox.show("'"+indexDir+"' exists, but is not a directory. Please choose a different path and try again.","Index Directory Error",Messagebox.OK,Messagebox.ERROR) ;
+				isConnected = false ;
+			}
+		} else {
+			if (Messagebox.show("Directory '"+indexDir+"'does not exist, would you like to create it?","Index Directory",Messagebox.YES|Messagebox.NO,Messagebox.EXCLAMATION)==Messagebox.YES) {
+				try {
+					if (!(new java.io.File(indexDir)).mkdirs()) {
+						isConnected = false ;
+						errorMessage = "Failed to create index directory '"+indexDir+"'. Please check your path and/or permissions and try again." ;
+					}
+				} catch (Exception e) {
+					errorMessage = "Unable to create index directory '"+indexDir+"'" ;
+					log.error(errorMessage,e) ;
+					isConnected = false ;
+				}
+			} else {
+				isConnected = false ;
+			}
 		}
 
 		// Build a JDBC connection URL based on the user's input
 		String dbType = (String)dbtype.getSelectedItem().getValue() ;
 		String dbUrlStr = null ;
-		if (dbType.compareTo("postgresql")==0) {
-			config.put("hibernate.connection.driver_class","org.postgresql.Driver") ;
-			config.put("hibernate.dialect","org.hibernate.dialect.PostgreSQLDialect") ;
-			dbUrlStr = "postgresql" ;
-		} else if (dbType.compareTo("mysql")==0) {
-			config.put("hibernate.connection.driver_class","com.mysql.jdbc.Driver") ;
-			config.put("hibernate.dialect","org.hibernate.dialect.MySQL5Dialect") ;
-			dbUrlStr = "mysql" ;
-		} else if (dbType.compareTo("sqlserver")==0) {
-			config.put("hibernate.connection.driver_class","com.microsoft.sqlserver.jdbc.SQLServerDriver") ;
-			config.put("hibernate.dialect","org.hibernate.dialect.SybaseDialect") ;
-			dbUrlStr = "sqlserver" ;
-		} else if (dbType.compareTo("db2")==0) {
-			config.put("hibernate.connection.driver_class","com.ibm.db2.jdbc.app.DB2Driver") ;
-			config.put("hibernate.dialect","org.hibernate.dialect.DB2Dialect") ;
-			dbUrlStr = "db2" ;
-		} else if (dbType.compareTo("oracle:thin")==0) {
-			config.put("hibernate.connection.driver_class","oracle.jdbc.driver.OracleDriver") ;
-			config.put("hibernate.dialect","org.hibernate.dialect.OracleDialect") ;
-			dbUrlStr = "oracle:thin" ;
-		} else {
-			Messagebox.show("For some reason the database type selection failed. Please re-select the database type and try again.","ERROR",Messagebox.OK,Messagebox.ERROR) ;
-		}
-		config.put("hibernate.connection.url","jdbc:"+dbUrlStr+"://"+dbhost.getValue()+"/"+dbname.getValue()) ;
-		config.put("hibernate.connection.username",dbuser.getValue()) ;
-		config.put("hibernate.connection.password",dbpass.getValue()) ;
 
-		// Prepare to test the database configuration and connection
-		boolean isConnected = true ;
-		String errorMessage = null ;
-		try {
-			// Attempt to load the database jdbc driver
-			Class.forName(config.get("hibernate.connection.driver_class"));
-		} catch (Exception e) {
-			errorMessage = "Unable to load JDBC driver for selected database. Make sure that you have placed the driver archive file(s) into the class path for your J2EE application server and restart the application server." ;
-			log.error(errorMessage,e) ;
-			isConnected = false ;
+		if (isConnected) {
+			if (dbType.compareTo("postgresql")==0) {
+				config.put("hibernate.connection.driver_class","org.postgresql.Driver") ;
+				config.put("hibernate.dialect","org.hibernate.dialect.PostgreSQLDialect") ;
+				dbUrlStr = "postgresql" ;
+			} else if (dbType.compareTo("mysql")==0) {
+				config.put("hibernate.connection.driver_class","com.mysql.jdbc.Driver") ;
+				config.put("hibernate.dialect","org.hibernate.dialect.MySQL5Dialect") ;
+				dbUrlStr = "mysql" ;
+			} else if (dbType.compareTo("sqlserver")==0) {
+				config.put("hibernate.connection.driver_class","com.microsoft.sqlserver.jdbc.SQLServerDriver") ;
+				config.put("hibernate.dialect","org.hibernate.dialect.SybaseDialect") ;
+				dbUrlStr = "sqlserver" ;
+			} else if (dbType.compareTo("db2")==0) {
+				config.put("hibernate.connection.driver_class","com.ibm.db2.jdbc.app.DB2Driver") ;
+				config.put("hibernate.dialect","org.hibernate.dialect.DB2Dialect") ;
+				dbUrlStr = "db2" ;
+			} else if (dbType.compareTo("oracle:thin")==0) {
+				config.put("hibernate.connection.driver_class","oracle.jdbc.driver.OracleDriver") ;
+				config.put("hibernate.dialect","org.hibernate.dialect.OracleDialect") ;
+				dbUrlStr = "oracle:thin" ;
+			} else {
+				Messagebox.show("For some reason the database type selection failed. Please re-select the database type and try again.","ERROR",Messagebox.OK,Messagebox.ERROR) ;
+				isConnected = false ;
+			}
+			config.put("hibernate.connection.url","jdbc:"+dbUrlStr+"://"+dbhost.getValue()+"/"+dbname.getValue()) ;
+			config.put("hibernate.connection.username",dbuser.getValue()) ;
+			config.put("hibernate.connection.password",dbpass.getValue()) ;
+
+			try {
+				// Attempt to load the database jdbc driver
+				Class.forName(config.get("hibernate.connection.driver_class"));
+			} catch (Exception e) {
+				errorMessage = "Unable to load JDBC driver for selected database. Make sure that you have placed the driver archive file(s) into the class path for your J2EE application server and restart the application server." ;
+				log.error(errorMessage,e) ;
+				isConnected = false ;
+			}
 		}
+
 		java.sql.Connection dbConnection = null ;
 		if (isConnected) {
 			try {
@@ -144,6 +189,7 @@
 				isConnected = false ;
 			}
 		}
+
 		if (isConnected) {
 			try {
 				// Test the connection by running a test query
@@ -171,7 +217,7 @@
 			nextButton.setLabel("Step 2 >>") ;
 			dbIsGood = true ;
 		} else {	// Otherwise, show the user a userful error which might help get the settings corrected
-			Messagebox.show(errorMessage+"Relevent portions of the error have been logged.","Database Error",Messagebox.OK,Messagebox.ERROR) ;
+			Messagebox.show(errorMessage+" Relevent portions of the error have been logged.","Database Error",Messagebox.OK,Messagebox.ERROR) ;
 		}
 	}
 	]]></zscript>
@@ -194,7 +240,7 @@
 			<label value="Database Host[:Port]: "/>
 		</vbox>
 		<vbox>
-			<textbox id="dbhost" width="160px" onCreate="self.setFocus(true)" onChange="setRetest();"/>
+			<textbox id="dbhost" width="160px" onChange="setRetest();" tooltiptext="The IP address or fully qualified hostname of the database server."/>
 		</vbox>
 	</hbox>
 	<hbox>
@@ -202,7 +248,7 @@
 			<label value="Database Name: "/>
 		</vbox>
 		<vbox>
-			<textbox id="dbname" width="160px" onChange="setRetest();"/>
+			<textbox id="dbname" width="160px" onChange="setRetest();" tooltiptext="The name of the database, may be case sensitive."/>
 		</vbox>
 	</hbox>
 	<hbox>
@@ -210,7 +256,7 @@
 			<label value="Database User: "/>
 		</vbox>
 		<vbox>
-			<textbox id="dbuser" width="160px" onChange="setRetest();"/>
+			<textbox id="dbuser" width="160px" onChange="setRetest();" tooltiptext="The username to use to authenticate to the database server"/>
 		</vbox>
 	</hbox>
 	<hbox>
@@ -218,7 +264,15 @@
 			<label value="Database Password: "/>
 		</vbox>
 		<vbox>
-			<textbox id="dbpass" type="password" value="" width="160px" onChange="setRetest();"/>
+			<textbox id="dbpass" type="password" value="" width="160px" onChange="setRetest();" tooltiptext="The password to use to authenticate to the database server"/>
+		</vbox>
+	</hbox>
+	<hbox>
+		<vbox width="160px">
+			<label value="Search Index Directory: "/>
+		</vbox>
+		<vbox>
+			<textbox id="luceneDir" value="/var/lucene/indexes" width="160px" onChange="setRetest();" tooltiptext="Where to store the search indices."/>
 		</vbox>
 	</hbox>
 	<hbox>
@@ -232,4 +286,10 @@
 	<hbox align="center">
 		<label visible="false" id="success" value="Database connection established successfully!" style="font-size: 14pt; color: #00AA00;"/>
 	</hbox>
+	<window id="initInstructions" mode="modal" title="Instructions" width="500px">
+		<vbox>
+			<label value="This screen will prompt you for information on creating the database schema for the application. The database itself must already exist and have proper permissions for the specified user to be able to create the tables, sequences, and views." />
+			<button label="Close" onClick="closeInstructions()" />
+		</vbox>
+	</window>
 </vbox>
