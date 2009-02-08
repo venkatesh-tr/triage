@@ -189,7 +189,7 @@
 		</hbox>
 	</vbox>
 	<hbox align="center" id="successBox" visible="false">
-		<label style="color: #66FF66;" value="Authentication works" />
+		<label style="color: #66FF66; font-size: 16pt;" value="Authentication works" />
 	</hbox>
 	<hbox align="center">
 		<button id="nextButton" onClick="saveConfig();" label="Test Authentication"/>

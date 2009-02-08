@@ -6,7 +6,12 @@
 	</window>
 	<zscript><![CDATA[
 	void saveConfig() {
-		
+		// Test the settings
+		if (nextButton.getLabel().contains("Test")) {
+			
+		} else {	// Save the settings
+			
+		}
 	}
 
 	void enableImapSettings() {
@@ -37,7 +42,7 @@
 			<label value="IMAP Username: "/>
 		</vbox>
 		<vbox>
-			<textbox id="imapUser" type="password" width="220px" disabled="true"/>
+			<textbox id="imapUser" width="220px" disabled="true"/>
 		</vbox>
 	</hbox>
 	<hbox>
@@ -45,7 +50,10 @@
 			<label value="IMAP Password: "/>
 		</vbox>
 		<vbox>
-			<textbox id="imapPass" width="220px" disabled="true"/>
+			<textbox id="imapPass" type="password" width="220px" disabled="true"/>
 		</vbox>
+	</hbox>
+	<hbox>
+		<button id="nextButton" label="Test IMAP" />
 	</hbox>
 </vbox>
