@@ -1,0 +1,50 @@
+<vbox id="ad" visible="true">
+	<hbox>
+		<vbox width="220px">
+			<label value="Domain Controller Address: "/>
+		</vbox>
+		<vbox>
+			<textbox id="addc" width="220px"/>
+		</vbox>
+	</hbox>
+	<hbox>
+		<vbox width="220px">
+			<label value="Domain Name (e.g. mycompany.com): "/>
+		</vbox>
+		<vbox>
+			<textbox id="addomain" width="220px"/>
+		</vbox>
+	</hbox>
+	<hbox>
+		<vbox width="220px">
+			<label value="Domain Admin Account: "/>
+		</vbox>
+		<vbox>
+			<textbox id="adadminuser" width="220px"/>
+		</vbox>
+	</hbox>
+	<hbox>
+		<vbox width="220px">
+			<label value="Domain Admin Password: "/>
+		</vbox>
+		<vbox>
+			<textbox id="adadminpass" type="password" width="220px"/>
+		</vbox>
+	</hbox>
+	<hbox>
+		<vbox width="220px">
+			<label value="Base DN (e.g. DC=mycompany,DC=com): "/>
+		</vbox>
+		<vbox>
+			<textbox id="adbasedn" width="220px"/>
+		</vbox>
+	</hbox>
+	<hbox>
+		<vbox width="220px">
+			<label value="Use SSL: "/>
+		</vbox>
+		<vbox>
+			<checkbox id="adUseSSL"/>
+		</vbox>
+	</hbox>
+</vbox>

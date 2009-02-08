@@ -1,8 +1,15 @@
-package com.blogspot.devenphillips.helpdesk.auth.plugins;
+package com.blogspot.devenphillips.helpdesk.auth.plugins.sql;
 
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
+import org.zkoss.zk.ui.Executions;
+import org.zkoss.zul.Label;
+import org.zkoss.zul.Vbox;
+import org.zkoss.zul.Window;
 import com.blogspot.devenphillips.helpdesk.auth.AuthException;
 import com.blogspot.devenphillips.helpdesk.auth.AuthProvider;
 import com.blogspot.devenphillips.helpdesk.auth.support.JCrypt;
@@ -86,4 +93,47 @@ public class SQLAuthProvider implements AuthProvider {
 		return retVal;
 	}
 
+	public static String getModuleShortName() {
+		return "SQL" ;
+	}
+
+	public static String getModuleName() {
+		return "SQL Authentication Provider" ;
+	}
+
+	public static String getModuleDescription() {
+		return "Allows for authenticating users and pulling user information from an SQL database." ;
+	}
+
+	public static String getVersion() {
+		return "0.0.1" ;
+	}
+
+	/**
+	 * Display an object which contains all of the inputs needed to configure the 
+	 * SQL Auth Provider module
+	 * @return An object which has components and events to configure the SQL Auth Provider module
+	 */
+	public static Vbox showConfig() {
+		java.io.InputStream zulInput = SQLAuthProvider.class.getClassLoader().getResourceAsStream("com/blogspot/devenphillips/helpdesk/auth/plugins/sql/config.zul") ;
+		Reader zulReader = new InputStreamReader(zulInput) ;
+		Vbox retVal = new Vbox() ;
+		try {
+			retVal = (Vbox)Executions.createComponentsDirectly(zulReader,"zul",null,new HashMap<String,String>()) ;
+		} catch (Exception e) {
+			Window errWin = new Window() ;
+			errWin.setTitle("Configuration Error") ;
+			try {
+				errWin.setMode("overlapped") ;
+			} catch (InterruptedException e1) {
+				// This catch block will never be reached because the window is not modal.
+			}
+			Label errMessage = new Label("Unable to load configuration interface for SQL.") ;
+			errWin.setWidth("400px") ;
+			errWin.setHeight("200px") ;
+			errWin.appendChild(errMessage) ;
+			retVal.appendChild(errWin) ;
+		}
+		return retVal ;
+	}
 }

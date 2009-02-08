@@ -1,0 +1,18 @@
+<vbox id="sql" visible="true">
+	<hbox>
+		<vbox width="220px">
+			<label value="Admin Username: "/>
+		</vbox>
+		<vbox>
+			<textbox id="sqladmin"/>
+		</vbox>
+	</hbox>
+	<hbox>
+		<vbox width="220px">
+			<label value="Admin Password: "/>
+		</vbox>
+		<vbox>
+			<textbox id="sqlpass"/>
+		</vbox>
+	</hbox>
+</vbox>
