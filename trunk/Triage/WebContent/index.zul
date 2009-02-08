@@ -14,7 +14,7 @@
 			desktop.getWebApp().getConfiguration().addListener(org.zkoss.zkplus.hibernate.OpenSessionInViewListener.class) ;
 			desktop.getWebApp().getConfiguration().addListener(org.zkoss.zkplus.hibernate.HibernateSessionContextListener.class) ;
 		} else {
-			Executions.createComponents("WEB-INF/sys/bootstrap/config3.zul",workspace,null) ;
+			Executions.createComponents("WEB-INF/sys/bootstrap/config2.zul",workspace,null) ;
 		}
 	}
 	]]></zscript>

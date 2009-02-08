@@ -1,0 +1,42 @@
+<vbox id="ldap" visible="true">
+	<hbox>
+		<vbox width="260px">
+			<label value="LDAP Server Address: "/>
+		</vbox>
+		<vbox>
+			<textbox id="ldapdc" width="220px"/>
+		</vbox>
+	</hbox>
+	<hbox>
+		<vbox width="260px">
+			<label value="Manager DN (CN=manager,DC=mycomapny,DC=com): "/>
+		</vbox>
+		<vbox>
+			<textbox id="ldapmanagerdn" width="220px"/>
+		</vbox>
+	</hbox>
+	<hbox>
+		<vbox width="260px">
+			<label value="LDAP Manager Password: "/>
+		</vbox>
+		<vbox>
+			<textbox id="ldapmanagerpass" type="password" width="220px"/>
+		</vbox>
+	</hbox>
+	<hbox>
+		<vbox width="260px">
+			<label value="Base DN (e.g. DC=mycompany,DC=com): "/>
+		</vbox>
+		<vbox>
+			<textbox id="ldapbasedn" width="220px"/>
+		</vbox>
+	</hbox>
+	<hbox>
+		<vbox width="260px">
+			<label value="Use SSL: "/>
+		</vbox>
+		<vbox>
+			<checkbox id="adUseSSL"/>
+		</vbox>
+	</hbox>
+</vbox>
