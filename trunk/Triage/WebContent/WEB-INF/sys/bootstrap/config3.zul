@@ -20,8 +20,13 @@
 		imapUser.setDisabled(status) ;
 		imapPass.setDisabled(status) ;
 	}
-	]]></zscript>	
-	<hbox>
+
+	void showImapConfig() {
+		testArea.appendChild(com.blogspot.devenphillips.helpdesk.generators.imap.IMAPGenerator.showConfig()) ;
+	}
+	]]></zscript>
+	<box id="testArea" onCreate="showImapConfig()" width="100%" />
+<!--	<hbox>
 		<vbox width="220px">
 			<label value="Use An IMAP Mailbox: "/>
 		</vbox>
@@ -55,5 +60,5 @@
 	</hbox>
 	<hbox>
 		<button id="nextButton" label="Test IMAP" />
-	</hbox>
+	</hbox>  -->
 </vbox>

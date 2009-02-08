@@ -1,0 +1,95 @@
+<hbox width="100%" height="100%">
+	<zscript><![CDATA[
+	boolean settingsWork = false ;
+
+	void buttonPressed() {
+		if (settingsWork) {
+			saveSettings() ;
+		} else {
+			testSettings() ;
+		}
+	}
+
+	void saveSettings() {
+		
+	}
+
+	void testSettings() {
+		String newButtonLabel = null ;
+		// Load the config object from the servlet container, this will work if we 
+		// are in the initial configuration stage
+		Properties config = desktop.getWebApp().getAttribute("config") ;
+		if (Properties.class.isInstance(config)) {
+			newButtonLabel = "Next >>" ;
+			config.remove("imap.server") ;
+			config.remove("imap.user") ;
+			config.remove("imap.pass") ;
+			config.remove("imap.useSSL") ;
+		} else {	// Otherwise, load the config from the props file
+			try {
+				config.load(new java.io.FileInputStream("helpdesk.properties")) ;
+			} catch (Exception e) {
+				config = null ;
+			}
+		}
+
+		// If neither method finds the config, show an error message to the user
+		if (config==null) {
+			Messagebox.show("Unable to locate configuration settings. This may mean that the application is misconfigured or unstable. This error should be investigated before continuing to use Triage.","Configuration Error",Messagebox.OK,Messagebox.ERROR) ;
+		} else {
+			newButtonLabel = "Apply" ;
+		}
+
+		config.put("imap.server",imapServer.getValue()) ;
+		config.put("imap.user",imapUser.getValue()) ;
+		config.put("imap.pass",imapPass.getValue()) ;
+		String useSSL = null ;
+		if (imapSSL.isChecked()) {
+			useSSL = "true" ;
+		} else {
+			useSSL = "false" ;
+		}
+		config.put("imap.useSSL",useSSL) ;
+		desktop.getWebApp().setAttribute("config",config) ;
+		nextButton.setLabel(newButtonLabel) ;
+		settingsWork = true ;
+	}
+	]]></zscript>
+	<vbox width="100%" height="100%">
+		<hbox>
+			<vbox width="220px">
+				<label value="IMAP Server: "/>
+			</vbox>
+			<vbox>
+				<textbox id="imapServer" width="220px"/>
+			</vbox>
+		</hbox>
+		<hbox>
+			<vbox width="220px">
+				<label value="IMAP Username: "/>
+			</vbox>
+			<vbox>
+				<textbox id="imapUser" width="220px"/>
+			</vbox>
+		</hbox>
+		<hbox>
+			<vbox width="220px">
+				<label value="IMAP Password: "/>
+			</vbox>
+			<vbox>
+				<textbox id="imapPass" type="password" width="220px"/>
+			</vbox>
+		</hbox>
+		<hbox>
+			<vbox width="220px">
+				<label value="Use SSL: "/>
+			</vbox>
+			<vbox>
+				<checkbox id="imapSSL" width="220px"/>
+			</vbox>
+		</hbox>
+		<hbox>
+			<button id="nextButton" label="Test IMAP" />
+		</hbox>
+	</vbox>
+</hbox>
