@@ -19,6 +19,7 @@ public class User implements java.io.Serializable {
 	@GeneratedValue(generator="user_seq",strategy=GenerationType.SEQUENCE)
 	private int userId = 0 ;
 
+	private String username = null ;
 	@Field(index=Index.TOKENIZED, store=Store.NO)
 	private String forename = null ;
 	@Field(index=Index.TOKENIZED, store=Store.NO)
@@ -103,9 +104,9 @@ public class User implements java.io.Serializable {
 		this.password = password;
 	}
 
-	public boolean checkPassword(String password) {
+	public String getPassword() {
 		// TODO: Check encrypted password VS database password.
-		return true ;
+		return password ;
 	}
 
 	public void setPreferences(Set<Preference> preferences) {
@@ -114,5 +115,13 @@ public class User implements java.io.Serializable {
 
 	public Set<Preference> getPreferences() {
 		return preferences;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getUsername() {
+		return username;
 	}
 }
