@@ -25,7 +25,7 @@
 	void setRetest() {
 		dbIsGood = false ;
 		String dbType = (String)dbtype.getSelectedItem().getValue() ;
-		if (dbType.compareTo("derby")==0) {
+		if (dbType.compareTo("hsqldb")==0) {
 			dbhost.setDisabled(true) ;
 			dbuser.setDisabled(true) ;
 			dbpass.setDisabled(true) ;
@@ -41,7 +41,7 @@
 		StringBuffer urlStr = new StringBuffer() ;
 		urlStr.append("jdbc:") ;
 		urlStr.append(dbtype.getSelectedItem().getValue()) ;
-		if (dbType.compareTo("derby")==0) {
+		if (dbType.compareTo("hsqldb")==0) {
 			urlStr.append(":"+dbname.getValue()+";create=true") ;
 		} else {
 			urlStr.append("://"+dbhost.getValue()+"/"+dbname.getValue()) ;
@@ -155,6 +155,12 @@
 		String dbType = (String)dbtype.getSelectedItem().getValue() ;
 		String dbUrlStr = null ;
 		StringBuffer options = new StringBuffer("") ;
+		String validationQuery = null ;
+		if (dbType.compareTo("hsqldb")==0) {
+			validationQuery = "COUNT(1)" ;
+		} else {
+			validationQuery = "SELECT '1' AS \"testval\"" ;
+		}
 
 		if (isConnected) {
 			if (dbType.compareTo("postgresql")==0) {
@@ -162,12 +168,11 @@
 				config.put("hibernate.dialect","org.hibernate.dialect.PostgreSQLDialect") ;
 				dbUrlStr = "postgresql" ;
 				config.put("hibernate.connection.url","jdbc:"+dbUrlStr+"://"+dbhost.getValue()+"/"+dbname.getValue()+options.toString()) ;
-			} else if (dbType.compareTo("derby")==0) {
-				config.put("hibernate.connection.driver_class","org.apache.derby.jdbc.EmbeddedDriver") ;
-				config.put("hibernate.dialect","org.hibernate.dialect.DerbyDialect") ;
-				dbUrlStr = "derby" ;
-				options.append(";create=true") ;
-				config.put("hibernate.connection.url","jdbc:"+dbUrlStr+":"+dbname.getValue()+options.toString()) ;
+			} else if (dbType.compareTo("hsqldb")==0) {
+				config.put("hibernate.connection.driver_class","org.hsqldb.jdbcDriver") ;
+				config.put("hibernate.dialect","org.hibernate.dialect.HSQLDialect") ;
+				dbUrlStr = "hsqldb" ;
+				config.put("hibernate.connection.url","jdbc:"+dbUrlStr+":/home/dphillips/"+dbname.getValue()+options.toString()) ;
 			} else if (dbType.compareTo("mysql")==0) {
 				config.put("hibernate.connection.driver_class","com.mysql.jdbc.Driver") ;
 				config.put("hibernate.dialect","org.hibernate.dialect.MySQL5Dialect") ;
@@ -195,7 +200,6 @@
 			}
 			config.put("hibernate.connection.username",dbuser.getValue()) ;
 			config.put("hibernate.connection.password",dbpass.getValue()) ;
-			alert("DB URL: "+config.get("hibernate.connection.url")) ;
 
 			try {
 				// Attempt to load the database jdbc driver
@@ -211,8 +215,8 @@
 		if (isConnected) {
 			try {
 				// Attempt to connect to the database using the provided configuration settings
-				if (dbType.compareTo("derby")==0) {
-					dbConnection = java.sql.DriverManager.getConnection(config.get("hibernate.connection.url")) ;
+				if (dbType.compareTo("hsqldb")==0) {
+					dbConnection = java.sql.DriverManager.getConnection(config.get("hibernate.connection.url"),"sa","") ;
 				} else {
 					dbConnection = java.sql.DriverManager.getConnection(
 							config.get("hibernate.connection.url"),
@@ -230,10 +234,10 @@
 			try {
 				// Test the connection by running a test query
 				java.sql.Statement st = dbConnection.createStatement() ;
-				java.sql.ResultSet rs = st.executeQuery("SELECT '1' AS testval") ;
+				java.sql.ResultSet rs = st.executeQuery(validationQuery) ;
 				while (rs.next()) {
-					int test = rs.getInt("testval") ;
-					if (test!=1) {
+					int test = rs.getInt(1) ;
+					if (test>=1) {
 						isConnected = false ;
 						errorMessage = "Unsuccessful test query against the database." ;
 					}
@@ -264,7 +268,7 @@
 		<vbox>
 			<listbox id="dbtype" rows="1" mold="select" onSelect="setRetest();" >
 				<listitem label="(Choose One)" value="" selected="true"/>
-				<listitem label="Embedded Database" value="derby"/>
+				<listitem label="Embedded Database" value="hsqldb"/>
 				<listitem label="PostgreSQL" value="postgresql"/>
 				<listitem label="MySQL" value="mysql"/>
 				<listitem label="Microsoft SQL Server" value="sqlserver"/>
