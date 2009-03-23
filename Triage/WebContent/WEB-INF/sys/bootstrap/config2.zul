@@ -32,16 +32,7 @@
 					successBox.setVisible(true) ;
 				}
 			} else if (authType.contains("sql")) {
-				config.put("auth.type","sql") ;
-				config.put("auth.sql.adminuser",sqladmin.getValue()) ;
-				config.put("auth.sql.adminpass",sqlpass.getValue()) ;
-				com.blogspot.devenphillips.helpdesk.auth.plugins.sql.SQLAuthProvider sqlProvider = new com.blogspot.devenphillips.helpdesk.auth.plugins.sql.SQLAuthProvider(config) ;
-				if (!adProvider.authenticate(adadminuser.getValue(),adadminpass.getValue())) {
-					Messagebox.show("Unable to authenticate with admin user and password.","SQL Authentication Error",Messagebox.OK,Messagebox.ERROR) ;
-				} else {
-					nextButton.setLabel("Step 3 >>") ;
-					successBox.setVisible(true) ;
-				}
+// TODO: Implement SQL Authentication code and insert initial admin username/password.
 			} else {
 				config.put("auth.type","ldap") ;
 				config.put("auth.ldap.server",ldapdc.getValue()) ;
