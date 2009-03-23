@@ -5,9 +5,9 @@
 		</hbox>
 	</window>
 	<zscript><![CDATA[
-	Properties config = null ;
+	public Properties config = null ;
 
-	org.zkoss.util.logging.Log log = org.zkoss.util.logging.Log.lookup(com.blogspot.devenphillips.helpdesk.zk.hibernate.HibernateUtil.class);
+	org.zkoss.util.logging.Log log = org.zkoss.util.logging.Log.lookup("com.blogspot.devenphillips.helpdesk");
 	boolean dbIsGood = false ;
 
 	void buttonPressed() {
@@ -27,7 +27,9 @@
 		String dbType = (String)dbtype.getSelectedItem().getValue() ;
 		if (dbType.compareTo("hsqldb")==0) {
 			dbhost.setDisabled(true) ;
+			dbuser.setValue("sa") ;
 			dbuser.setDisabled(true) ;
+			dbpass.setValue("") ;
 			dbpass.setDisabled(true) ;
 			dbname.setDisabled(true) ;
 			dbname.setValue("helpdesk") ;
@@ -156,44 +158,45 @@
 		String dbUrlStr = null ;
 		StringBuffer options = new StringBuffer("") ;
 		String validationQuery = null ;
-		if (dbType.compareTo("hsqldb")==0) {
-			validationQuery = "COUNT(1)" ;
-		} else {
-			validationQuery = "SELECT '1' AS \"testval\"" ;
-		}
 
 		if (isConnected) {
 			if (dbType.compareTo("postgresql")==0) {
 				config.put("hibernate.connection.driver_class","org.postgresql.Driver") ;
 				config.put("hibernate.dialect","org.hibernate.dialect.PostgreSQLDialect") ;
 				dbUrlStr = "postgresql" ;
-				config.put("hibernate.connection.url","jdbc:"+dbUrlStr+"://"+dbhost.getValue()+"/"+dbname.getValue()+options.toString()) ;
+				validationQuery = "SELECT 1 AS \"testval\"" ;
+				config.put("hibernate.connection.url","jdbc:"+dbUrlStr+"://"+dbhost.getValue()+"/"+dbname.getValue()) ;
 			} else if (dbType.compareTo("hsqldb")==0) {
 				config.put("hibernate.connection.driver_class","org.hsqldb.jdbcDriver") ;
 				config.put("hibernate.dialect","org.hibernate.dialect.HSQLDialect") ;
 				dbUrlStr = "hsqldb" ;
-				config.put("hibernate.connection.url","jdbc:"+dbUrlStr+":/home/dphillips/"+dbname.getValue()+options.toString()) ;
+				config.put("hibernate.connection.url","jdbc:"+dbUrlStr+":"+application.getRealPath("/WEB-INF/")+"/"+dbname.getValue()) ;
+				log.info("Creating new HSQLDb with properties file: "+application.getRealPath("/WEB-INF/")+"/"+dbname.getValue()+".properties") ;
+				validationQuery = "select 1 from INFORMATION_SCHEMA.SYSTEM_USERS" ;
 			} else if (dbType.compareTo("mysql")==0) {
 				config.put("hibernate.connection.driver_class","com.mysql.jdbc.Driver") ;
 				config.put("hibernate.dialect","org.hibernate.dialect.MySQL5Dialect") ;
 				dbUrlStr = "mysql" ;
 				options.append(";autoReconnect=true") ;
-				config.put("hibernate.connection.url","jdbc:"+dbUrlStr+"://"+dbhost.getValue()+"/"+dbname.getValue()+options.toString()) ;
+				config.put("hibernate.connection.url","jdbc:"+dbUrlStr+"://"+dbhost.getValue()+"/"+dbname.getValue()) ;
+				validationQuery = "SELECT 1 AS \"testval\"" ;
 			} else if (dbType.compareTo("sqlserver")==0) {
 				config.put("hibernate.connection.driver_class","com.microsoft.sqlserver.jdbc.SQLServerDriver") ;
 				config.put("hibernate.dialect","org.hibernate.dialect.SybaseDialect") ;
 				dbUrlStr = "sqlserver" ;
-				config.put("hibernate.connection.url","jdbc:"+dbUrlStr+"://"+dbhost.getValue()+"/"+dbname.getValue()+options.toString()) ;
-			} else if (dbType.compareTo("db2")==0) {
+				config.put("hibernate.connection.url","jdbc:"+dbUrlStr+"://"+dbhost.getValue()+"/"+dbname.getValue()) ;
+				validationQuery = "SELECT 1 AS \"testval\"" ;
+/*			} else if (dbType.compareTo("db2")==0) {				// TODO: Implement DB2 and Oracle support.
 				config.put("hibernate.connection.driver_class","com.ibm.db2.jdbc.app.DB2Driver") ;
 				config.put("hibernate.dialect","org.hibernate.dialect.DB2Dialect") ;
 				dbUrlStr = "db2" ;
-				config.put("hibernate.connection.url","jdbc:"+dbUrlStr+"://"+dbhost.getValue()+"/"+dbname.getValue()+options.toString()) ;
+				config.put("hibernate.connection.url","jdbc:"+dbUrlStr+"://"+dbhost.getValue()+"/"+dbname.getValue()) ;
+				validationQuery = "SELECT 1 AS \"testval\"" ;
 			} else if (dbType.compareTo("oracle:thin")==0) {
 				config.put("hibernate.connection.driver_class","oracle.jdbc.driver.OracleDriver") ;
 				config.put("hibernate.dialect","org.hibernate.dialect.OracleDialect") ;
 				dbUrlStr = "oracle:thin" ;
-				config.put("hibernate.connection.url","jdbc:"+dbUrlStr+"://"+dbhost.getValue()+"/"+dbname.getValue()+options.toString()) ;
+				config.put("hibernate.connection.url","jdbc:"+dbUrlStr+"://"+dbhost.getValue()+"/"+dbname.getValue()) ; */
 			} else {
 				Messagebox.show("For some reason the database type selection failed. Please re-select the database type and try again.","ERROR",Messagebox.OK,Messagebox.ERROR) ;
 				isConnected = false ;
@@ -226,6 +229,7 @@
 			} catch (Exception e) {
 				errorMessage = "Unable to connect to the database using the options provided. The error message was '"+e.getLocalizedMessage()+"'" ;
 				log.error(errorMessage,e) ;
+				log.error("Connection string used was: "+config.get("hibernate.connection.url")) ;
 				isConnected = false ;
 			}
 		}
@@ -233,24 +237,27 @@
 		if (isConnected) {
 			try {
 				// Test the connection by running a test query
+				log.info("Running validation query against the database: "+validationQuery) ;
 				java.sql.Statement st = dbConnection.createStatement() ;
 				java.sql.ResultSet rs = st.executeQuery(validationQuery) ;
 				while (rs.next()) {
 					int test = rs.getInt(1) ;
-					if (test>=1) {
+					if (test!=1) {
 						isConnected = false ;
-						errorMessage = "Unsuccessful test query against the database." ;
+						errorMessage = "Unsuccessful test query against the database. Result of validation query ('"+test+"') does not match expected value." ;
 					}
 				}
 			} catch (Exception e) {
 				isConnected = false ;
-				errorMessage = "Unable to run a test query against the database." ;
+				errorMessage = "Unable to run a test query against the database. "+e.getLocalizedMessage() ;
 				log.error(errorMessage,e) ;
 			}
 		}
 
 		// If all tests succeed, the change the button to allow progress to the next step and save the settings
 		if (isConnected) {
+			config.put("hibernate.c3p0.preferredTestQuery",validationQuery) ;
+			config.put("hibernate.connection.url",config.get("hibernate.connection.url")+options.toString()) ;
 			dbConnection.close() ;
 			dbConnection = null ;
 			success.setVisible(true) ;
@@ -272,8 +279,8 @@
 				<listitem label="PostgreSQL" value="postgresql"/>
 				<listitem label="MySQL" value="mysql"/>
 				<listitem label="Microsoft SQL Server" value="sqlserver"/>
-				<listitem label="DB2" value="db2"/>
-				<listitem label="Oracle" value="oracle:thin"/>
+<!-- 			<listitem label="DB2" value="db2"/> 					// TODO: Implement DB2 and Oracle support.
+				<listitem label="Oracle" value="oracle:thin"/> -->
 			</listbox>
 		</vbox>
 	</hbox>

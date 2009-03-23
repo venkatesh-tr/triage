@@ -10,6 +10,8 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import org.apache.log4j.Logger;
+
 public class Bootstrap extends GenericServlet {
 
 	/**
@@ -25,14 +27,18 @@ public class Bootstrap extends GenericServlet {
 	}
 
 	public void init() {
+		Logger log = org.apache.log4j.LogManager.getLogger("com.blogspot.devenphillips.helpdesk") ;
 		Properties config = new Properties() ;
 		boolean isConfigured = true ;
 		try {
+			log.debug("Attempting to load configuration file if it exists.") ;
 			config.load(new FileInputStream("helpdesk.properties")) ;
 		} catch (FileNotFoundException e) {
+			log.debug("Application configuration file does not exist.") ;
 			this.getServletContext().log("Error loading properties file. Application is not yet configured.") ;
 			isConfigured = false ;
 		} catch (IOException e) {
+			log.debug("Unable to read application configuration file.") ;
 			this.getServletContext().log("Error loading properties file. Application is not yet configured.") ;
 			isConfigured = false ;
 		}
@@ -43,8 +49,10 @@ public class Bootstrap extends GenericServlet {
 			String dbdialect = config.getProperty("db.dialect") ;
 			String dbuser = config.getProperty("db.user") ;
 			String dbpass = config.getProperty("db.pass") ;*/
+			log.debug("Setting application context variable to indicate that the application is configured.") ;
 			this.getServletContext().setAttribute("isConfigured", "true") ;
 		} else {
+			log.debug("Setting application context variable to indicate that the application is NOT configured.") ;
 			this.getServletContext().setAttribute("isConfigured", "false") ;
 		}
 	}

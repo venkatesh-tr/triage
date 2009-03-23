@@ -1,7 +1,6 @@
 package com.blogspot.devenphillips.helpdesk.data.dao;
 
 import java.util.List;
-
 import org.hibernate.Session;
 import com.blogspot.devenphillips.helpdesk.data.User;
 import com.blogspot.devenphillips.helpdesk.zk.hibernate.HibernateUtil;
